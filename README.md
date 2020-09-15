@@ -3,7 +3,7 @@
 # LeagueSkinChanger
 LeagueSkinChanger is internal skin changer for League of Legends.
 
-- Use any available skin for your champion or any other in game, enemy and ally
+- Use any available skin for your champion, or any other in game, enemy or ally
 - Automatic skins database update
 - Change skin for lane minions
 - In-game configuration with <a href="https://github.com/ocornut/imgui">ImGui</a>
