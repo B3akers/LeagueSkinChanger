@@ -178,12 +178,13 @@ void menu::draw( ) {
 		ImGui::Separator( );
 
 		auto my_team = player ? player->get_team( ) : 100;
-		auto heroes = reinterpret_cast<manager_template<obj_ai_hero*>*>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::ManagerTemplate_AIHero_ );
+		auto heroes = *reinterpret_cast<manager_template<obj_ai_hero>**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::ManagerTemplate_AIHero_ );
 
 		ImGui::Text( "Other championss skins settings:" );
 
 		auto last_team = int32_t( 0 );
-		for ( auto& hero : heroes->list ) {
+		for ( size_t i = 0; i < heroes->length; i++ ) {
+			auto hero = heroes->list[ i ];
 			if ( hero == player )
 				continue;
 

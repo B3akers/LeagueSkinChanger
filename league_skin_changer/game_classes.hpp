@@ -125,7 +125,9 @@ public:
 
 template <class T>
 class manager_template {
-	PAD( 0x24 );
+	PAD( 0x4 );
 public:
-	std::vector<T> list;
+	T** list;
+	size_t length;
+	size_t capacity;
 };

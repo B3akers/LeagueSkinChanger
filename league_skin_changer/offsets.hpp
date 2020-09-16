@@ -27,13 +27,13 @@
 namespace offsets {
 	namespace global {
 		enum {
-			Player = 0x34E1A34,
-			ChampionManager = 0x34DAB54,
-			Riot__g_window = 0x34E1A20,
-			GfxWinMsgProc = 0x3500C40,
-			ManagerTemplate_AIMinionClient_ = 0x288E8A8,
-			ManagerTemplate_AIHero_ = 0x288E730,
-			GameClient = 0x34DAB64,
+			Player = 0x34E0280,
+			ChampionManager = 0x034D93A4,
+			Riot__g_window = 0x34E026C,
+			GfxWinMsgProc = 0x34FF420,
+			ManagerTemplate_AIMinionClient_ = 0x1C3D790,
+			ManagerTemplate_AIHero_ = 0x01C3B63C,
+			GameClient = 0x34D93B4,
 		};
 	};
 
@@ -65,12 +65,12 @@ namespace offsets {
 
 	namespace functions {
 		enum {
-			Riot__Renderer__MaterialRegistry__GetSingletonPtr = 0x99DB50,
-			translateString_UNSAFE_DONOTUSE = 0xA81DC0,
-			CharacterDataStack__Push = 0x0013FAD0,
-			CharacterDataStack__Update = 0x00127CC0,
-			GetOwnerObject = 0x00172F30,
-			CharacterData__GetCharacterPackage = 0x00231EB0
+			Riot__Renderer__MaterialRegistry__GetSingletonPtr = 0x0099A6C0,
+			translateString_UNSAFE_DONOTUSE = 0x00A7E720,
+			CharacterDataStack__Push = 0x0013FD00,
+			CharacterDataStack__Update = 0x00127B70,
+			GetOwnerObject = 0x001738E0,
+			CharacterData__GetCharacterPackage = 0x00233260
 		};
 	};
 };

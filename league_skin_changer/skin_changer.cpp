@@ -39,8 +39,8 @@ std::once_flag change_skins;
 void skin_changer::update( ) {
 	auto league_module = std::uintptr_t( GetModuleHandle( nullptr ) );
 	auto player = *reinterpret_cast<obj_ai_base**>( league_module + offsets::global::Player );
-	auto heroes = reinterpret_cast<manager_template<obj_ai_hero*>*>( league_module + offsets::global::ManagerTemplate_AIHero_ );
-	auto minions = reinterpret_cast<manager_template<obj_ai_minion*>*>( league_module + offsets::global::ManagerTemplate_AIMinionClient_ );
+	auto heroes = *reinterpret_cast<manager_template<obj_ai_hero>**>( league_module + offsets::global::ManagerTemplate_AIHero_ );
+	auto minions = *reinterpret_cast<manager_template<obj_ai_minion>**>( league_module + offsets::global::ManagerTemplate_AIMinionClient_ );
 
 	// Change skins for champions when skin changer was loaded
 	//
@@ -53,7 +53,8 @@ void skin_changer::update( ) {
 		}
 
 		auto my_team = player ? player->get_team( ) : 100;
-		for ( auto& hero : heroes->list ) {
+		for ( size_t i = 0; i < heroes->length; i++ ) {
+			auto hero = heroes->list[ i ];
 			if ( hero == player )
 				continue;
 
@@ -72,7 +73,8 @@ void skin_changer::update( ) {
 		}
 		} );
 
-	for ( auto& hero : heroes->list ) {
+	for ( size_t i = 0; i < heroes->length; i++ ) {
+		auto hero = heroes->list[ i ];
 		// Fix for champions like elise with second form which is applied by pushing character data via server with original skinid we have to handle it
 		//
 		if ( hero->get_character_data_stack( )->stack.size( ) > 0 ) {
@@ -94,7 +96,8 @@ void skin_changer::update( ) {
 		}
 	};
 
-	for ( auto& minion : minions->list ) {
+	for ( size_t i = 0; i < minions->length; i++ ) {
+		auto minion = minions->list[ i ];
 		auto owner = minion->get_owner( );
 
 		if ( owner ) {
