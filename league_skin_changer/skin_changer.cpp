@@ -152,10 +152,11 @@ void skin_changer::init( ) {
 	freopen( "CONIN$", "r", stdin );
 	freopen( "CONOUT$", "w", stdout );
 	freopen( "CONOUT$", "w", stderr );
+
+	autoupdater::start( );
 #endif
 
 	config::load( );
-	autoupdater::start( );
 	skin_database::load( );
 	d3d9_hook::hook( );
 

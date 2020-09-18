@@ -32,6 +32,8 @@ BOOL APIENTRY DllMain( HMODULE h_module,
 ) {
 	switch ( ul_reason_for_call ) {
 		case DLL_PROCESS_ATTACH:
+			if ( h_module )
+				DisableThreadLibraryCalls( h_module );
 #ifdef DEBUG
 			skin_changer::my_module = h_module;
 			CreateThread( NULL, 0, (LPTHREAD_START_ROUTINE)skin_changer::init, NULL, 0, NULL );

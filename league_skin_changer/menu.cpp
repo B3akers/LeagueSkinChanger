@@ -67,13 +67,13 @@ void config::save( ) {
 	for ( auto& it : config::current_combo_jungle_mob_skin_index )
 		config_json[ "current_combo_jungle_mob_skin_index" ][ std::to_string( it.first ) ] = it.second;
 
-	auto out = std::ofstream( "league_changer.json" );
+	auto out = std::ofstream( L"league_changer.json" );
 	out << config_json.dump( );
 	out.close( );
 }
 
 void config::load( ) {
-	auto out = std::ifstream( "league_changer.json" );
+	auto out = std::ifstream( L"league_changer.json" );
 	if ( !out.good( ) )
 		return;
 

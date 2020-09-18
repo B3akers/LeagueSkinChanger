@@ -64,6 +64,72 @@ LRESULT __cdecl wnd_proc( HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param ) 
 std::once_flag init_device;
 std::unique_ptr<vmt_smart_hook> d3d_device_vmt = nullptr;
 
+bool get_system_font_path( const std::string& name, std::string& path ) {
+	char buffer[ MAX_PATH ];
+	HKEY registryKey;
+
+	GetWindowsDirectoryA( buffer, MAX_PATH );
+	std::string fontsFolder = buffer + std::string( "\\Fonts\\" );
+
+	if ( RegOpenKeyExA( HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", 0, KEY_READ, &registryKey ) ) {
+		return false;
+	}
+
+	uint32_t valueIndex = 0;
+	char valueName[ MAX_PATH ];
+	uint8_t valueData[ MAX_PATH ];
+	std::wstring wsFontFile;
+
+	do {
+		uint32_t valueNameSize = MAX_PATH;
+		uint32_t valueDataSize = MAX_PATH;
+		uint32_t valueType;
+
+		auto error = RegEnumValueA(
+			registryKey,
+			valueIndex,
+			valueName,
+			reinterpret_cast<DWORD*>( &valueNameSize ),
+			0,
+			reinterpret_cast<DWORD*>( &valueType ),
+			valueData,
+			reinterpret_cast<DWORD*>( &valueDataSize ) );
+
+		valueIndex++;
+
+		if ( error == ERROR_NO_MORE_ITEMS ) {
+			RegCloseKey( registryKey );
+			return false;
+		}
+
+		if ( error || valueType != REG_SZ ) {
+			continue;
+		}
+
+		if ( _strnicmp( name.data( ), valueName, name.size( ) ) == 0 ) {
+			path = fontsFolder + std::string( (char*)valueData, valueDataSize );
+			RegCloseKey( registryKey );
+			return true;
+		}
+	} while ( true );
+
+	return false;
+}
+
+static const ImWchar ranges[ ] =
+{
+	0x0020, 0x00FF, // Basic Latin + Latin Supplement
+	0x0400, 0x044F, // Cyrillic
+	0x0100, 0x017F, // Latin Extended-A
+	0x0180, 0x024F, // Latin Extended-B
+	0x2000, 0x206F, // General Punctuation
+	0x3000, 0x30FF, // Punctuations, Hiragana, Katakana
+	0x31F0, 0x31FF, // Katakana Phonetic Extensions
+	0xFF00, 0xFFEF, // Half-width characters
+	0x4e00, 0x9FAF, // CJK Ideograms
+	0,
+};
+
 namespace d3d_vtable {
 	struct end_scene {
 		static long __stdcall hooked( IDirect3DDevice9* p_device ) {
@@ -73,15 +139,19 @@ namespace d3d_vtable {
 
 				ImGui::GetIO( ).ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
+				std::string font_path;
+				if ( get_system_font_path( "Courier", font_path ) )
+					ImGui::GetIO( ).Fonts->AddFontFromFileTTF( font_path.c_str( ), 14, 0, ranges );
+
 				ImGui_ImplWin32_Init( *reinterpret_cast<HWND*>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::Riot__g_window ) );
 				ImGui_ImplDX9_Init( p_device );
 
 				original_wndproc = *reinterpret_cast<riot_wndproc*>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GfxWinMsgProc );
 				*reinterpret_cast<riot_wndproc*>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GfxWinMsgProc ) = wnd_proc;
-			} );
+				} );
 
 			auto client = *reinterpret_cast<game_client**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
-	
+
 			if ( client && client->game_state == game_state_stage::running ) {
 				skin_changer::update( );
 
