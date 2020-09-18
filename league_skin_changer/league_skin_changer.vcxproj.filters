@@ -35,6 +35,9 @@
     <Filter Include="src\json">
       <UniqueIdentifier>{7a1fb59e-1417-4d30-967c-e8ea7dfb206b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\autoupdate">
+      <UniqueIdentifier>{fb0c6058-a093-4f26-bc23-dd4f3d31e4c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="skin_changer.cpp">
@@ -73,6 +76,12 @@
     </ClCompile>
     <ClCompile Include="menu.cpp">
       <Filter>src\menu</Filter>
+    </ClCompile>
+    <ClCompile Include="autoupdater.cpp">
+      <Filter>src\autoupdate</Filter>
+    </ClCompile>
+    <ClCompile Include="offsets.cpp">
+      <Filter>src\offsets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +141,9 @@
     </ClInclude>
     <ClInclude Include="json.hpp">
       <Filter>src\json</Filter>
+    </ClInclude>
+    <ClInclude Include="autoupdater.hpp">
+      <Filter>src\autoupdate</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

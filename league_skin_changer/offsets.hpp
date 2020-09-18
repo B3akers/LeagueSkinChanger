@@ -23,39 +23,9 @@
 * SOFTWARE.
 */
 #pragma once
+#include <cinttypes>
 
 namespace offsets {
-	namespace global {
-		enum {
-			Player = 0x34E0280,
-			ChampionManager = 0x034D93A4,
-			Riot__g_window = 0x34E026C,
-			GfxWinMsgProc = 0x34FF420,
-			ManagerTemplate_AIMinionClient_ = 0x1C3D790,
-			ManagerTemplate_AIHero_ = 0x01C3B63C,
-			GameClient = 0x34D93B4,
-		};
-	};
-
-	namespace ai_base {
-		enum {
-			CharacterDataStack = 0x2F58,
-			SkinId = 0xED4
-		};
-	};
-
-	namespace material_registry {
-		enum {
-			D3DDevice = 0x200
-		};
-	};
-
-	namespace ai_minion {
-		enum {
-			IsLaneMinion = 0x37A0
-		};
-	};
-
 	namespace game_object {
 		enum {
 			Name = 0x6C,
@@ -63,14 +33,35 @@ namespace offsets {
 		};
 	};
 
+	namespace global {
+		extern uint32_t Player;
+		extern uint32_t ChampionManager;
+		extern uint32_t Riot__g_window;
+		extern uint32_t GfxWinMsgProc;
+		extern uint32_t ManagerTemplate_AIMinionClient_;
+		extern uint32_t ManagerTemplate_AIHero_;
+		extern uint32_t GameClient;
+	};
+
+	namespace ai_base {
+		extern uint32_t CharacterDataStack;
+		extern uint32_t SkinId;
+	};
+
+	namespace material_registry {
+		extern uint32_t D3DDevice;
+	};
+
+	namespace ai_minion {
+		extern uint32_t IsLaneMinion;
+	};
+
 	namespace functions {
-		enum {
-			Riot__Renderer__MaterialRegistry__GetSingletonPtr = 0x0099A6C0,
-			translateString_UNSAFE_DONOTUSE = 0x00A7E720,
-			CharacterDataStack__Push = 0x0013FD00,
-			CharacterDataStack__Update = 0x00127B70,
-			GetOwnerObject = 0x001738E0,
-			CharacterData__GetCharacterPackage = 0x00233260
-		};
+		extern uint32_t Riot__Renderer__MaterialRegistry__GetSingletonPtr;
+		extern uint32_t translateString_UNSAFE_DONOTUSE;
+		extern uint32_t CharacterDataStack__Push;
+		extern uint32_t CharacterDataStack__Update;
+		extern uint32_t GetOwnerObject;
+		extern uint32_t CharacterData__GetCharacterPackage;
 	};
 };

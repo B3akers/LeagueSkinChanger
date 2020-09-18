@@ -29,9 +29,11 @@
 #include "menu.hpp"
 #include "fnv_hash.hpp"
 #include "game_classes.hpp"
+#include "autoupdater.hpp"
 
 #include <Windows.h>
 #include <cinttypes>
+#include <thread>
 #include <mutex>
 
 std::once_flag change_skins;
@@ -145,7 +147,34 @@ void skin_changer::update( ) {
 }
 
 void skin_changer::init( ) {
+#ifdef DEBUG
+	AllocConsole( );
+	freopen( "CONIN$", "r", stdin );
+	freopen( "CONOUT$", "w", stdout );
+	freopen( "CONOUT$", "w", stderr );
+#endif
+
 	config::load( );
+	autoupdater::start( );
 	skin_database::load( );
 	d3d9_hook::hook( );
+
+#ifdef DEBUG
+	while ( true ) {
+
+		if ( GetAsyncKeyState( VK_F7 ) )
+			break;
+
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for( 100ms );
+	}
+
+	d3d9_hook::unhook( );
+	FreeConsole( );
+	FreeLibraryAndExitThread( my_module,0 );
+#endif
 }
+
+#ifdef DEBUG
+HMODULE skin_changer::my_module;
+#endif

@@ -22,28 +22,8 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */
-#include <Windows.h>
-
-#include "skin_changer.hpp"
-
-BOOL APIENTRY DllMain( HMODULE h_module,
-	DWORD  ul_reason_for_call,
-	LPVOID lp_reserved
-) {
-	switch ( ul_reason_for_call ) {
-		case DLL_PROCESS_ATTACH:
-#ifdef DEBUG
-			skin_changer::my_module = h_module;
-			CreateThread( NULL, 0, (LPTHREAD_START_ROUTINE)skin_changer::init, NULL, 0, NULL );
-#else
-			skin_changer::init( );
-#endif
-			break;
-		case DLL_THREAD_ATTACH:
-		case DLL_THREAD_DETACH:
-		case DLL_PROCESS_DETACH:
-			break;
-	}
-	return TRUE;
-}
+#pragma once
+namespace autoupdater { 
+	void start( );
+};
 

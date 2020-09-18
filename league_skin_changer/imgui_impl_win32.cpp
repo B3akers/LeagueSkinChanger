@@ -15,6 +15,8 @@
 #include <windows.h>
 #include <tchar.h>
 
+#define IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
+
 // Using XInput library for gamepad (with recent Windows SDK this may leads to executables which won't run on Windows 7)
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
 #include <XInput.h>

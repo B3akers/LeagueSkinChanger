@@ -71,6 +71,8 @@ namespace d3d_vtable {
 				ImGui::CreateContext( );
 				ImGui::StyleColorsDark( );
 
+				ImGui::GetIO( ).ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+
 				ImGui_ImplWin32_Init( *reinterpret_cast<HWND*>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::Riot__g_window ) );
 				ImGui_ImplDX9_Init( p_device );
 
