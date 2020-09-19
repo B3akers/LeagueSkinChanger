@@ -27,6 +27,7 @@
 #include "vmt_smart_hook.hpp"
 #include "menu.hpp"
 #include "skin_changer.hpp"
+#include "skin_database.hpp"
 
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_win32.h"
@@ -134,6 +135,8 @@ namespace d3d_vtable {
 	struct end_scene {
 		static long __stdcall hooked( IDirect3DDevice9* p_device ) {
 			std::call_once( init_device, [ & ] ( ) {
+				skin_database::load( );
+
 				ImGui::CreateContext( );
 				ImGui::StyleColorsDark( );
 

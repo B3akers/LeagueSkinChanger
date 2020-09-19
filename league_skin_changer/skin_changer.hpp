@@ -29,7 +29,5 @@ namespace skin_changer {
 	void update( );
 	void init( );
 
-#ifdef DEBUG
 	extern HMODULE my_module;
-#endif
 };

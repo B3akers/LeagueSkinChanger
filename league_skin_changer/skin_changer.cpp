@@ -152,30 +152,38 @@ void skin_changer::init( ) {
 	freopen( "CONIN$", "r", stdin );
 	freopen( "CONOUT$", "w", stdout );
 	freopen( "CONOUT$", "w", stderr );
-
-	autoupdater::start( );
 #endif
 
+	autoupdater::start( );
+	
+	// Wait for game to start
+	//
+	using namespace std::chrono_literals;
+	auto client = *reinterpret_cast<game_client**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
+	while ( !client || client->game_state != game_state_stage::running ) {
+		std::this_thread::sleep_for( 100ms );
+		client = *reinterpret_cast<game_client**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
+	}
+
+	std::this_thread::sleep_for( 500ms );
+
 	config::load( );
-	skin_database::load( );
 	d3d9_hook::hook( );
 
-#ifdef DEBUG
 	while ( true ) {
 
 		if ( GetAsyncKeyState( VK_F7 ) )
 			break;
 
 		using namespace std::chrono_literals;
-		std::this_thread::sleep_for( 100ms );
+		std::this_thread::sleep_for( 200ms );
 	}
 
 	d3d9_hook::unhook( );
+#ifdef DEBUG
 	FreeConsole( );
-	FreeLibraryAndExitThread( my_module,0 );
 #endif
+	FreeLibraryAndExitThread( my_module, 0 );
 }
 
-#ifdef DEBUG
 HMODULE skin_changer::my_module;
-#endif

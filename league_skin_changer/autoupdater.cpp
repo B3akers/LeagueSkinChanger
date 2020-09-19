@@ -24,11 +24,14 @@
 */
 #include "autoupdater.hpp"
 #include "offsets.hpp"
+#include "game_classes.hpp"
 
 #include <Windows.h>
 #include <vector>
 #include <cinttypes>
 #include <string>
+#include <thread>
+#include <chrono>
 
 uint8_t* find_signature( const wchar_t* szModule, const char* szSignature ) {
 	auto module = GetModuleHandle( szModule );
@@ -52,44 +55,36 @@ uint8_t* find_signature( const wchar_t* szModule, const char* szSignature ) {
 
 	auto dosHeader = (PIMAGE_DOS_HEADER)module;
 	auto ntHeaders = (PIMAGE_NT_HEADERS)( (uint8_t*)module + dosHeader->e_lfanew );
+	auto textSection = IMAGE_FIRST_SECTION( ntHeaders );
 
-	auto sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
+	auto sizeOfImage = textSection->SizeOfRawData;
 	auto patternBytes = pattern_to_byte( szSignature );
-	auto scanBytes = reinterpret_cast<uint8_t*>( module );
-
-	if ( !szModule && GetModuleHandle( L"stub.dll" ) ) {
-		static const auto get_shadow_page = [ ] ( ) {
-			const auto img_base = (DWORD)GetModuleHandle( nullptr );
-			const auto img_dos_header = reinterpret_cast<IMAGE_DOS_HEADER*>( img_base );
-			const auto img_nt_headers = reinterpret_cast<IMAGE_NT_HEADERS32*>( img_base + img_dos_header->e_lfanew );
-			const auto lol_img_size = img_nt_headers->OptionalHeader.SizeOfImage;
-
-			auto cur = std::uintptr_t( 0 );
-			while ( true ) {
-				MEMORY_BASIC_INFORMATION mbi;
-				if ( !VirtualQuery( reinterpret_cast<void*>( cur ), &mbi, sizeof( mbi ) ) )
-					break;
-
-				const auto base_address = reinterpret_cast<std::uintptr_t>( mbi.BaseAddress );
-				if ( mbi.State == MEM_COMMIT && mbi.Type == MEM_MAPPED && mbi.RegionSize == lol_img_size && mbi.Protect == PAGE_READWRITE )
-					return base_address;
-				else
-					cur = base_address + mbi.RegionSize;
-			}
-			return std::uintptr_t( 0 );
-		};
-
-		scanBytes = reinterpret_cast<uint8_t*>( get_shadow_page() );
-	}
+	auto scanBytes = reinterpret_cast<uint8_t*>( module ) + textSection->VirtualAddress;
 
 	auto s = patternBytes.size( );
 	auto d = patternBytes.data( );
 
-	auto mem_info = MEMORY_BASIC_INFORMATION { 0 };
+	auto mbi = MEMORY_BASIC_INFORMATION { 0 };
+	uint8_t* next_check_address = 0;
 
 	for ( auto i = 0ul; i < sizeOfImage - s; ++i ) {
 		bool found = true;
 		for ( auto j = 0ul; j < s; ++j ) {
+			auto current_address = scanBytes + i + j;
+			if ( current_address >= next_check_address ) {
+				if ( !VirtualQuery( reinterpret_cast<void*>( current_address ), &mbi, sizeof( mbi ) ) )
+					break;
+
+				if ( mbi.Protect == PAGE_NOACCESS ) {
+					i += ( ( std::uintptr_t( mbi.BaseAddress ) + mbi.RegionSize ) - ( std::uintptr_t( scanBytes ) + i ) );
+					i--;
+					found = false;
+					break;
+				} else {
+					next_check_address = reinterpret_cast<uint8_t*>( mbi.BaseAddress ) + mbi.RegionSize;
+				}
+			}
+
 			if ( scanBytes[ i + j ] != d[ j ] && d[ j ] != -1 ) {
 				found = false;
 				break;
@@ -287,32 +282,49 @@ std::vector<offset_signature> sigs = {
 
 void autoupdater::start( ) {
 	auto base = std::uintptr_t( GetModuleHandle( nullptr ) );
-	for ( auto& sig : sigs ) {
-		
-		*sig.offset = 0;
-		for ( auto& pattern : sig.sigs ) {
-			auto address = find_signature( nullptr, pattern.c_str( ) );
 
-			if ( !address )
+	//Invalid all
+	// 
+	for ( auto& sig : sigs )
+		*sig.offset = 0;
+
+	while ( true ) {
+		auto missing_offset = false;
+		for ( auto& sig : sigs ) {
+
+			if ( *sig.offset != 0 )
 				continue;
 
-			if ( sig.read )
-				address = *reinterpret_cast<uint8_t**>( address + ( pattern.find_first_of( "?" ) / 3 ) );
-			else if ( address[ 0 ] == 0xE8 )
-				address = address + *reinterpret_cast<uint32_t*>( address + 1 ) + 5;
+			for ( auto& pattern : sig.sigs ) {
+				auto address = find_signature( nullptr, pattern.c_str( ) );
 
-			if ( sig.sub_base )
-				address -= base;
+				if ( !address )
+					continue;
 
-			address += sig.additional;
+				if ( sig.read )
+					address = *reinterpret_cast<uint8_t**>( address + ( pattern.find_first_of( "?" ) / 3 ) );
+				else if ( address[ 0 ] == 0xE8 )
+					address = address + *reinterpret_cast<uint32_t*>( address + 1 ) + 5;
 
-			*sig.offset = reinterpret_cast<uint32_t>( address );
-			break;
+				if ( sig.sub_base )
+					address -= base;
+
+				address += sig.additional;
+
+				*sig.offset = reinterpret_cast<uint32_t>( address );
+				break;
+			}
+
+			if ( !*sig.offset ) {
+				missing_offset = true;
+				break;
+			}
 		}
 
-		if ( !*sig.offset ) {
-			MessageBoxA( nullptr, "Signature failed, please wait for update!", "AutoUpdater: Error", MB_OK | MB_ICONERROR );
+		if ( !missing_offset )
 			break;
-		}
+
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for( 2s );
 	}
 }
