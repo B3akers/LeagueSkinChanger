@@ -12,6 +12,13 @@ LeagueSkinChanger is internal skin changer for League of Legends.
 - Support for spectator mode
 - <a href="https://github.com/nlohmann/json">JSON</a> based configuration saving & loading
 
+# Usage
+- Clone the source with: git clone --recursive https://github.com/B3akers/LeagueSkinChanger.git
+- Compile using your preferred compiler
+- Inject the resulting library into the game or use league_skin_injector
+- Press <kbd>Insert</kbd> to bring up the menu.
+- Select skin for you, your teammates, enemies, wards, etc.
+
 # License
 <b>This project is licensed under the MIT license</b>
 
