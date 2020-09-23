@@ -152,7 +152,7 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"8B 1D ? ? ? ? 8B 49 08",
+			"A1 ? ? ? ? 53 55 8B 6C 24 1C",
 			"A1 ? ? ? ? F3 0F 10 40 ? F3 0F 11 44 24"
 		},
 		true,
@@ -209,6 +209,15 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
+			"8B 8E ? ? ? ? 52 57"
+		},
+		false,
+		true,
+		0,
+		&offsets::material_registry::SwapChain
+	},
+	{
+		{
 			"8A 86 ? ? ? ? 88 4C 24 17",
 			"8A 86 ? ? ? ? 88 4C 24 4C 33 C9 0F B6 D0 84 C0 74 1E",
 			"8A 86 ? ? ? ? 88 4C 24 1B"
@@ -260,8 +269,8 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"E8 ? ? ? ? 85 C0 74 3A 8B CE",
-			"E8 ? ? ? ? 8B F8 3B F7 0F 84"
+			"E8 ? ? ? ? 8B F8 3B F7 0F 84",
+			"E8 ? ? ? ? 8B F0 85 F6 74 33 8B 06",
 		},
 		true,
 		false,
@@ -279,6 +288,8 @@ std::vector<offset_signature> sigs = {
 		&offsets::functions::CharacterData__GetCharacterPackage
 	}
 };
+
+//8B 8E ? ? ? ? 52 57
 
 void autoupdater::start( ) {
 	auto base = std::uintptr_t( GetModuleHandle( nullptr ) );
@@ -298,9 +309,12 @@ void autoupdater::start( ) {
 			for ( auto& pattern : sig.sigs ) {
 				auto address = find_signature( nullptr, pattern.c_str( ) );
 
-				if ( !address )
+				if ( !address ) {
+#ifdef DEBUG
+					printf( "Signature failed: %s\n", pattern.c_str());
+#endif
 					continue;
-
+				}
 				if ( sig.read )
 					address = *reinterpret_cast<uint8_t**>( address + ( pattern.find_first_of( "?" ) / 3 ) );
 				else if ( address[ 0 ] == 0xE8 )

@@ -24,7 +24,7 @@
 */
 #include "skin_changer.hpp"
 #include "offsets.hpp"
-#include "d3d9_hook.hpp"
+#include "d3d_hook.hpp"
 #include "skin_database.hpp"
 #include "menu.hpp"
 #include "fnv_hash.hpp"
@@ -153,7 +153,7 @@ void skin_changer::init( ) {
 	freopen( "CONOUT$", "w", stdout );
 	freopen( "CONOUT$", "w", stderr );
 #endif
-
+	
 	autoupdater::start( );
 	
 	// Wait for game to start
@@ -168,7 +168,7 @@ void skin_changer::init( ) {
 	std::this_thread::sleep_for( 500ms );
 
 	config::load( );
-	d3d9_hook::hook( );
+	d3d_hook::hook( );
 
 	while ( true ) {
 
@@ -179,7 +179,7 @@ void skin_changer::init( ) {
 		std::this_thread::sleep_for( 200ms );
 	}
 
-	d3d9_hook::unhook( );
+	d3d_hook::unhook( );
 #ifdef DEBUG
 	FreeConsole( );
 #endif

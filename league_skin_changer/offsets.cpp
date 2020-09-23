@@ -41,6 +41,7 @@ namespace offsets {
 
 	namespace material_registry {
 		uint32_t D3DDevice = 0x200;
+		uint32_t SwapChain = 0x10C;
 	};
 
 	namespace ai_minion {

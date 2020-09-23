@@ -5,9 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="src\d3d9">
-      <UniqueIdentifier>{6b382e58-2f4f-42a8-8d19-ea492ca17eb7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\sdk">
       <UniqueIdentifier>{e168d0f0-d453-47c1-867e-8e15f16f1918}</UniqueIdentifier>
     </Filter>
@@ -38,15 +35,18 @@
     <Filter Include="src\autoupdate">
       <UniqueIdentifier>{fb0c6058-a093-4f26-bc23-dd4f3d31e4c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\d3d">
+      <UniqueIdentifier>{6b382e58-2f4f-42a8-8d19-ea492ca17eb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\imgui\d3d11">
+      <UniqueIdentifier>{b874ff58-83f7-458d-8e30-65b796924c58}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="skin_changer.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="d3d9_hook.cpp">
-      <Filter>src\d3d9</Filter>
-    </ClCompile>
     <ClCompile Include="skin_database.cpp">
       <Filter>src\skins</Filter>
     </ClCompile>
@@ -83,13 +83,16 @@
     <ClCompile Include="offsets.cpp">
       <Filter>src\offsets</Filter>
     </ClCompile>
+    <ClCompile Include="d3d_hook.cpp">
+      <Filter>src\d3d</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_dx11.cpp">
+      <Filter>src\imgui\d3d11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="skin_changer.hpp">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="d3d9_hook.hpp">
-      <Filter>src\d3d9</Filter>
     </ClInclude>
     <ClInclude Include="skin_database.hpp">
       <Filter>src\skins</Filter>
@@ -144,6 +147,12 @@
     </ClInclude>
     <ClInclude Include="autoupdater.hpp">
       <Filter>src\autoupdate</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d_hook.hpp">
+      <Filter>src\d3d</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_impl_dx11.h">
+      <Filter>src\imgui\d3d11</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

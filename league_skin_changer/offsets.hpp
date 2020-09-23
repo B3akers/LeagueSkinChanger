@@ -50,6 +50,7 @@ namespace offsets {
 
 	namespace material_registry {
 		extern uint32_t D3DDevice;
+		extern uint32_t SwapChain;
 	};
 
 	namespace ai_minion {

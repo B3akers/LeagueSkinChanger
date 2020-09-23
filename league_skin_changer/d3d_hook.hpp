@@ -23,7 +23,7 @@
 * SOFTWARE.
 */
 #pragma once
-namespace d3d9_hook {
+namespace d3d_hook {
 	void hook( );
 	void unhook( );
 };
