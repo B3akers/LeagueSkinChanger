@@ -131,3 +131,10 @@ public:
 	size_t length;
 	size_t capacity;
 };
+
+template <class T>
+class manager_template_old {
+	PAD( 0x24 );
+public:
+	std::vector<T> list;
+};

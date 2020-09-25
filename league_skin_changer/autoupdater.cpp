@@ -110,7 +110,8 @@ std::vector<offset_signature> sigs = {
 	{
 		{
 			"A1 ? ? ? ? 83 C4 04 C6 40 36 15",
-			"8B 35 ? ? ? ? 68 ? ? ? ? E8 ? ? ? ? 83 C4 04 C7 44 24 ? ? ? ? ? 89 44 24 18"
+			"8B 35 ? ? ? ? 68 ? ? ? ? E8 ? ? ? ? 83 C4 04 C7 44 24 ? ? ? ? ? 89 44 24 18",
+			"8B 0D ? ? ? ? FF B0 ? ? ? ? E8 ? ? ? ? A1"
 		},
 		true,
 		true,
@@ -132,7 +133,8 @@ std::vector<offset_signature> sigs = {
 		{
 			"8B 0D ? ? ? ? 50 8D 44 24 18",
 			"8B 35 ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24 ? ? ? ? ? E8",
-			"8B 0D ? ? ? ? 53 FF 37"
+			"8B 0D ? ? ? ? 53 FF 37",
+			"B9 ? ? ? ? E8 ? ? ? ? 8D 88"
 		},
 		true,
 		true,
@@ -153,7 +155,8 @@ std::vector<offset_signature> sigs = {
 	{
 		{
 			"A1 ? ? ? ? 53 55 8B 6C 24 1C",
-			"A1 ? ? ? ? F3 0F 10 40 ? F3 0F 11 44 24"
+			"A1 ? ? ? ? F3 0F 10 40 ? F3 0F 11 44 24",
+			"B9 ? ? ? ? E8 ? ? ? ? 8B 0D ? ? ? ? 3B C1 7F 1F 83 E9 01 89 0D ? ? ? ? 79 14 A1 ? ? ? ? 2B 05 ? ? ? ? C1 F8 02 48 A3 ? ? ? ? 8B 87"
 		},
 		true,
 		true,
@@ -171,7 +174,8 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"A1 ? ? ? ? 55 57 53"
+			"A1 ? ? ? ? 55 57 53",
+			"A1 ? ? ? ? 53 55 57 85 C0"
 		},
 		true,
 		true,
@@ -209,7 +213,8 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"8B 8E ? ? ? ? 52 57"
+			"8B 8E ? ? ? ? 52 57",
+			"8B 8E ? ? ? ? FF B6 ? ? ? ? 51"
 		},
 		false,
 		true,
@@ -220,7 +225,8 @@ std::vector<offset_signature> sigs = {
 		{
 			"8A 86 ? ? ? ? 88 4C 24 17",
 			"8A 86 ? ? ? ? 88 4C 24 4C 33 C9 0F B6 D0 84 C0 74 1E",
-			"8A 86 ? ? ? ? 88 4C 24 1B"
+			"8A 86 ? ? ? ? 88 4C 24 1B",
+			"8A 87 ? ? ? ? 88 4C 24 13 33 C9 0F B6 D0 84 C0 74 15"
 		},
 		false,
 		true,
@@ -259,8 +265,8 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
+			"E8 ? ? ? ? 8B 0D ? ? ? ? 83 C4 04 8B F0 6A 0B",
 			"83 EC 0C 56 8B 74 24 14 56 E8 ? ? ? ? 83 C4 04 89 74 24 04 89 44 24 08 A8 01",
-			"E8 ? ? ? ? 8B 0D ? ? ? ? 83 C4 04 8B F0 6A 0B"
 		},
 		true,
 		false,
@@ -271,6 +277,8 @@ std::vector<offset_signature> sigs = {
 		{
 			"E8 ? ? ? ? 8B F8 3B F7 0F 84",
 			"E8 ? ? ? ? 8B F0 85 F6 74 33 8B 06",
+			"E8 ? ? ? ? 85 C0 74 3A 8B CE",
+			"E8 ? ? ? ? 39 44 24 1C 5F"
 		},
 		true,
 		false,
@@ -288,8 +296,6 @@ std::vector<offset_signature> sigs = {
 		&offsets::functions::CharacterData__GetCharacterPackage
 	}
 };
-
-//8B 8E ? ? ? ? 52 57
 
 void autoupdater::start( ) {
 	auto base = std::uintptr_t( GetModuleHandle( nullptr ) );
@@ -335,7 +341,7 @@ void autoupdater::start( ) {
 			}
 		}
 
-		if ( !missing_offset )
+		if ( !missing_offset)
 			break;
 
 		using namespace std::chrono_literals;
