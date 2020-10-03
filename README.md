@@ -19,6 +19,16 @@ LeagueSkinChanger is internal skin changer for League of Legends.
 - Press <kbd>Insert</kbd> to bring up the menu.
 - Select skin for you, your teammates, enemies, wards, etc.
 
+## Note
+If you want to use Visual Studio:
+- Use Visual Studio 2019 
+- Retarget solution to latest version:
+	* Right click solution in Solution Explorer
+	* Click "Retarget solution"
+	* Select "lastest installed version"
+	* Select both projects and hit "ok"
+- Solution configuration should be: Debug | x86
+
 # License
 <b>This project is licensed under the MIT license</b>
 
