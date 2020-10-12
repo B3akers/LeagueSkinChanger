@@ -70,8 +70,10 @@ void skin_changer::update( ) {
 			if ( config_entry == config_array.end( ) )
 				continue;
 
-			auto& values = skin_database::champions_skins[ champion_name_hash ];
-			hero->change_skin( values[ config_entry->second - 1 ].model_name.c_str( ), values[ config_entry->second - 1 ].skin_id );
+			if ( config_entry->second > 0 ) {
+				auto& values = skin_database::champions_skins[ champion_name_hash ];
+				hero->change_skin( values[ config_entry->second - 1 ].model_name.c_str( ), values[ config_entry->second - 1 ].skin_id );
+			}
 		}
 		} );
 
@@ -153,9 +155,9 @@ void skin_changer::init( ) {
 	freopen( "CONOUT$", "w", stdout );
 	freopen( "CONOUT$", "w", stderr );
 #endif
-	
+
 	autoupdater::start( );
-	
+
 	// Wait for game to start
 	//
 	using namespace std::chrono_literals;
