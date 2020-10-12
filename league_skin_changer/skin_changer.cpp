@@ -131,7 +131,11 @@ void skin_changer::update( ) {
 			if ( minion->is_lane_minion( ) ) {
 				// Change skin for lane minions
 				//
-				change_skin_for_object( minion, config::current_minion_skin_index * 2 );
+
+				if ( player && player->get_team( ) == 200 )
+					change_skin_for_object( minion, config::current_minion_skin_index * 2 + 1 );
+				else
+					change_skin_for_object( minion, config::current_minion_skin_index * 2 );
 			} else {
 				// Change skin for other minions like baron, blue etc.
 				//
@@ -186,6 +190,6 @@ void skin_changer::init( ) {
 	FreeConsole( );
 #endif
 	FreeLibraryAndExitThread( my_module, 0 );
-}
+	}
 
 HMODULE skin_changer::my_module;
