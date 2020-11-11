@@ -29,8 +29,8 @@
 #include <Windows.h>
 
 void character_data_stack::push( const char* model, int32_t skin ) {
-	static const auto Push = reinterpret_cast<int( __thiscall* )( void*, const char* model, int32_t skinid, int32_t, bool update_spells, bool dont_update_hud, bool change_particle, bool, char, const char*, int32_t, const char*, int32_t )>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::CharacterDataStack__Push );
-	Push( this, model, skin, 0, false, false, true, false, -1, "\x00", 0, "\x00", 0 );
+	static const auto Push = reinterpret_cast<int( __thiscall* )( void*, const char* model, int32_t skinid, int32_t, bool update_spells, bool dont_update_hud, bool, bool change_particle, bool, char, const char*, int32_t, const char*, int32_t )>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::CharacterDataStack__Push );
+	Push( this, model, skin, 0, false, false, true, false, false, -1, "\x00", 0, "\x00", 0 );
 }
 
 void character_data_stack::update( bool change ) {

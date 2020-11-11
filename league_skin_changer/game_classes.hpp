@@ -67,9 +67,9 @@ class champion_data {
 	PAD( 0x4 );
 public:
 	riot_string champion_name;
-	PAD( 0x30 );
+	PAD( 0x48 );
 	std::vector<champion_skin_data> skins;
-	PAD( 0x4 );
+	PAD( 0x8 );
 };
 
 class champion_manager {
