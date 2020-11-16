@@ -30,7 +30,7 @@
 
 void character_data_stack::push( const char* model, int32_t skin ) {
 	static const auto Push = reinterpret_cast<int( __thiscall* )( void*, const char* model, int32_t skinid, int32_t, bool update_spells, bool dont_update_hud, bool, bool change_particle, bool, char, const char*, int32_t, const char*, int32_t )>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::CharacterDataStack__Push );
-	Push( this, model, skin, 0, false, false, true, false, false, -1, "\x00", 0, "\x00", 0 );
+	Push( this, model, skin, 0, false, false, false, true, false, -1, "\x00", 0, "\x00", 0 );
 }
 
 void character_data_stack::update( bool change ) {
@@ -48,16 +48,22 @@ void obj_ai_base::change_skin( const char* model, int32_t skin ) {
 
 	//Lux has same skinid but diff model we have to handle it, game receives packets and calls Push function to change skin we do same but don't pushing new class but modify existing
 	//
-	if ( skin == 7 && fnv::hash_runtime( this->get_character_data_stack( )->base_skin.model.str ) == FNV( "Lux" ) ) {
-		if ( this->get_character_data_stack( )->stack.empty( ) ) {
-			this->get_character_data_stack( )->push( model, skin );
-			return;
+	if ( fnv::hash_runtime( this->get_character_data_stack( )->base_skin.model.str ) == FNV( "Lux" ) ) {
+		if ( skin == 7 ) {
+			if ( this->get_character_data_stack( )->stack.empty( ) ) {
+				this->get_character_data_stack( )->push( model, skin );
+				return;
+			}
+			auto& last = this->get_character_data_stack( )->stack.back( );
+			last.skin = skin;
+			last.model.str = model;
+			last.model.length = strlen( model );
+			last.model.capacity = last.model.length + 1;
+		} else {
+			//Make sure that stack for lux is cleared
+			//
+			this->get_character_data_stack( )->stack.clear( );
 		}
-		auto& last = this->get_character_data_stack( )->stack.back( );
-		last.skin = skin;
-		last.model.str = model;
-		last.model.length = strlen( model );
-		last.model.capacity = last.model.length + 1;
 	}
 
 	this->get_character_data_stack( )->update( true );
