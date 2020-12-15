@@ -26,17 +26,17 @@
 namespace offsets {
 	namespace global {
 		uint32_t Player = 0x34E0280;
-		uint32_t ChampionManager = 0x034D93A4;
+		uint32_t ChampionManager = 0x34F3428;
 		uint32_t Riot__g_window = 0x34E026C;
 		uint32_t GfxWinMsgProc = 0x34FF420;
-		uint32_t ManagerTemplate_AIMinionClient_ = 0x1C3D790;
-		uint32_t ManagerTemplate_AIHero_ = 0x01C3B63C;
+		uint32_t ManagerTemplate_AIMinionClient_ = 0x28A9C24;
+		uint32_t ManagerTemplate_AIHero_ = 0x1C5B580;
 		uint32_t GameClient = 0x34D93B4;
 	};
 
 	namespace ai_base {
-		uint32_t CharacterDataStack = 0x2F58;
-		uint32_t SkinId = 0xED4;
+		uint32_t CharacterDataStack = 0x2F38;
+		uint32_t SkinId = 0xE9C;
 	};
 
 	namespace material_registry {
@@ -45,15 +45,15 @@ namespace offsets {
 	};
 
 	namespace ai_minion {
-		uint32_t IsLaneMinion = 0x37A0;
+		uint32_t IsLaneMinion = 0x3780;
 	};
 
 	namespace functions {
 		uint32_t Riot__Renderer__MaterialRegistry__GetSingletonPtr = 0x0099A6C0;
-		uint32_t translateString_UNSAFE_DONOTUSE = 0x00A7E720;
-		uint32_t CharacterDataStack__Push = 0x0013FD00;
-		uint32_t CharacterDataStack__Update = 0x00127B70;
-		uint32_t GetOwnerObject = 0x001738E0;
-		uint32_t CharacterData__GetCharacterPackage = 0x00233260;
+		uint32_t translateString_UNSAFE_DONOTUSE = 0xA9B710;
+		uint32_t CharacterDataStack__Push = 0x1148C0;
+		uint32_t CharacterDataStack__Update = 0x10ADC0;
+		uint32_t GetOwnerObject = 0x16B810;
+		uint32_t CharacterData__GetCharacterPackage = 0x23A740;
 	};
 };
