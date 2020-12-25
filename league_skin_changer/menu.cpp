@@ -49,7 +49,7 @@ std::map<uint32_t, int32_t> config::current_combo_enemy_skin_index;
 auto config_json = json( );
 
 void config::save( ) {
-	auto player = *reinterpret_cast<obj_ai_base**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::Player );
+	auto player = *reinterpret_cast<AIBaseCommon**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::Player );
 	if ( player )
 		config_json[ std::string( player->get_character_data_stack( )->base_skin.model.str ) + ".current_combo_skin_index" ] = current_combo_skin_index;
 
@@ -79,7 +79,7 @@ void config::load( ) {
 
 	config_json = json::parse( out );
 
-	auto player = *reinterpret_cast<obj_ai_base**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::Player );
+	auto player = *reinterpret_cast<AIBaseCommon**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::Player );
 	if ( player )
 		current_combo_skin_index = config_json.value( std::string( player->get_character_data_stack( )->base_skin.model.str ) + ".current_combo_skin_index", 0 );
 
@@ -144,7 +144,7 @@ void menu::draw( ) {
 			return true;
 		};
 
-		auto player = *reinterpret_cast<obj_ai_base**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::Player );
+		auto player = *reinterpret_cast<AIBaseCommon**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::Player );
 		if ( player ) {
 			auto& values = skin_database::champions_skins[ fnv::hash_runtime( player->get_character_data_stack( )->base_skin.model.str ) ];
 			ImGui::Text( "Localplayer skins settings:" );
@@ -178,7 +178,7 @@ void menu::draw( ) {
 		ImGui::Separator( );
 
 		auto my_team = player ? player->get_team( ) : 100;
-		auto heroes = *reinterpret_cast<manager_template<obj_ai_hero>**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::ManagerTemplate_AIHero_ );
+		auto heroes = *reinterpret_cast<ManagerTemplate<AIHero>**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::ManagerTemplate_AIHero_ );
 
 		ImGui::Text( "Other championss skins settings:" );
 
@@ -206,7 +206,7 @@ void menu::draw( ) {
 			auto champion_name_hash = fnv::hash_runtime( hero->get_character_data_stack( )->base_skin.model.str );
 			auto config_entry = config_array.insert( { champion_name_hash,0 } );
 
-			snprintf( str_buffer, 256, "Current skin (%s)##%X", hero->get_name( ).c_str( ), reinterpret_cast<uintptr_t>( hero ) );
+			snprintf( str_buffer, 256, "Current skin (%s)##%X", hero->name( ).c_str( ), reinterpret_cast<uintptr_t>( hero ) );
 
 			auto& values = skin_database::champions_skins[ champion_name_hash ];
 			if ( ImGui::Combo( str_buffer, &config_entry.first->second, vector_getter_skin, static_cast<void*>( &values ), values.size( ) + 1 ) )

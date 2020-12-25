@@ -28,21 +28,21 @@
 
 #include <Windows.h>
 
-void character_data_stack::push( const char* model, int32_t skin ) {
-	static const auto Push = reinterpret_cast<int( __thiscall* )( void*, const char* model, int32_t skinid, int32_t, bool update_spells, bool dont_update_hud, bool, bool change_particle, bool, char, const char*, int32_t, const char*, int32_t )>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::CharacterDataStack__Push );
+void CharacterDataStack::push( const char* model, std::int32_t skin ) {
+	static const auto Push = reinterpret_cast<int( __thiscall* )( void*, const char* model, std::int32_t skinid, std::int32_t, bool update_spells, bool dont_update_hud, bool, bool change_particle, bool, char, const char*, std::int32_t, const char*, std::int32_t )>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::CharacterDataStack__Push );
 	Push( this, model, skin, 0, false, false, false, true, false, -1, "\x00", 0, "\x00", 0 );
 }
 
-void character_data_stack::update( bool change ) {
+void CharacterDataStack::update( bool change ) {
 	static const auto Update = reinterpret_cast<void( __thiscall* )( void*, bool )>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::CharacterDataStack__Update );
 	Update( this, change );
 }
 
-void obj_ai_base::change_skin( const char* model, int32_t skin ) {
+void AIBaseCommon::change_skin( const char* model, std::int32_t skin ) {
 
 	//Update skinid in object class to appear name in scoreboard and fix for some things
 	//
-	reinterpret_cast<xor_value<int32_t>*>( std::uintptr_t( this ) + offsets::ai_base::SkinId )->encrypt( skin );
+	reinterpret_cast<xor_value<std::int32_t>*>( std::uintptr_t( this ) + offsets::ai_base::SkinId )->encrypt( skin );
 
 	this->get_character_data_stack( )->base_skin.skin = skin;
 
@@ -69,11 +69,11 @@ void obj_ai_base::change_skin( const char* model, int32_t skin ) {
 	this->get_character_data_stack( )->update( true );
 }
 
-obj_ai_base* obj_ai_minion::get_owner( ) {
-	static const auto GetOwnerObject = reinterpret_cast<obj_ai_base * ( __thiscall* )( void* )>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::GetOwnerObject );
-	return GetOwnerObject( this );
+AIBaseCommon* AIMinionClient::get_gold_redirect_target( ) {
+	static const auto GetGoldRedirectTarget = reinterpret_cast<AIBaseCommon * ( __thiscall* )( void* )>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::GetGoldRedirectTarget );
+	return GetGoldRedirectTarget( this );
 }
 
-bool obj_ai_minion::is_lane_minion( ) {
+bool AIMinionClient::is_lane_minion( ) {
 	return reinterpret_cast<xor_value<bool>*>( std::uintptr_t( this ) + offsets::ai_minion::IsLaneMinion )->decrypt( );
 }

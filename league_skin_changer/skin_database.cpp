@@ -33,7 +33,7 @@
 void skin_database::load( ) {
 	static const auto translateString_UNSAFE_DONOTUSE = reinterpret_cast<const char* ( __cdecl* )( const char* )>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::translateString_UNSAFE_DONOTUSE );
 
-	auto g_championg_manager = *reinterpret_cast<champion_manager**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::ChampionManager );
+	auto g_championg_manager = *reinterpret_cast<ChampionManager**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::ChampionManager );
 	for ( auto& champion : g_championg_manager->champions ) {
 		std::vector<int32_t> skins_ids;
 		for ( auto& skin : champion->skins )

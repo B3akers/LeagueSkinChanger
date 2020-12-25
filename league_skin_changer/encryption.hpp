@@ -34,7 +34,7 @@ class xor_value {
 	unsigned char bytes_xor_count_8;
 	t xor_key;
 	unsigned char value_index = 0;
-	t values_table[ 3 ];
+	t values_table[ 4 ];
 public:
 	t decrypt( ) {
 		if ( xor_key_was_init != 1 )
@@ -101,7 +101,7 @@ public:
 				*( reinterpret_cast<unsigned char*>( &xored_value ) + i ) ^= ~xor_value_ptr[ i ];
 		}
 
-		auto new_value_index = uint8_t( value_index + 1 ) % 3;
+		auto new_value_index = uint8_t( value_index + 1 ) & 3;
 
 		values_table[ new_value_index ] = xored_value;
 

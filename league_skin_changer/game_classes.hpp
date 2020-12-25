@@ -33,7 +33,7 @@
 #define MACRO_CONCAT(x, y) CONCAT_IMPL(x, y)
 #define PAD(SIZE) uint8_t MACRO_CONCAT(_pad, __COUNTER__)[SIZE];
 
-namespace game_state_stage {
+namespace GGameState_s {
 	enum values {
 		loading_screen = 0,
 		connecting = 1,
@@ -44,44 +44,46 @@ namespace game_state_stage {
 	};
 };
 
-class game_client {
+class GameClient {
 	PAD( 0x8 );
 public:
-	int32_t game_state;
+	std::int32_t game_state;
 };
 
-class riot_string {
+class AString {
 public:
 	const char* str;
-	size_t length;
-	size_t capacity;
+	std::size_t length;
+	std::size_t capacity;
 };
 
-class champion_skin_data {
+class Champion {
 public:
-	int32_t skin_id;
-	riot_string skin_name;
-};
-
-class champion_data {
+	class Skin
+	{
+	public:
+		std::int32_t skin_id;
+		AString skin_name;
+	};
+private:
 	PAD( 0x4 );
 public:
-	riot_string champion_name;
+	AString champion_name;
 	PAD( 0x48 );
-	std::vector<champion_skin_data> skins;
+	std::vector<Skin> skins;
 	PAD( 0x8 );
 };
 
-class champion_manager {
+class ChampionManager {
 	PAD( 0xC );
 public:
-	std::vector<champion_data*> champions;
+	std::vector<Champion*> champions;
 };
 
-class character_data {
+class CharacterStackData {
 public:
-	riot_string model;
-	int32_t skin;
+	AString model;
+	std::int32_t skin;
 	PAD( 0x20 );
 	bool update_spells;
 	bool dont_update_hud;
@@ -90,51 +92,44 @@ public:
 	PAD( 0xC );
 };
 
-class character_data_stack {
+class CharacterDataStack {
 public:
-	std::vector<character_data> stack;
-	character_data base_skin;
+	std::vector<CharacterStackData> stack;
+	CharacterStackData base_skin;
 
 	void update( bool change );
-	void push( const char* model, int32_t skin );
+	void push( const char* model, std::int32_t skin );
 };
 
-class game_object {
+class GameObject {
 public:
-	std::string& get_name( ) { return *reinterpret_cast<std::string*>( std::uintptr_t( this ) + offsets::game_object::Name ); }
-	int32_t get_team( ) { return *reinterpret_cast<int32_t*>( std::uintptr_t( this ) + offsets::game_object::Team ); }
+	std::string& name( ) { return *reinterpret_cast<std::string*>( std::uintptr_t( this ) + offsets::game_object::Name ); }
+	std::int32_t get_team( ) { return *reinterpret_cast< std::int32_t*>( std::uintptr_t( this ) + offsets::game_object::Team ); }
 };
 
-class obj_ai_base : public game_object {
+class AIBaseCommon : public GameObject {
 public:
-	character_data_stack* get_character_data_stack( ) { return reinterpret_cast<character_data_stack*>( std::uintptr_t( this ) + offsets::ai_base::CharacterDataStack ); }
+	CharacterDataStack* get_character_data_stack( ) { return reinterpret_cast<CharacterDataStack*>( std::uintptr_t( this ) + offsets::ai_base::CharacterDataStack ); }
 
-	void change_skin( const char* model, int32_t skin );
+	void change_skin( const char* model, std::int32_t skin );
 };
 
-class obj_ai_hero : public obj_ai_base {
+class AIHero : public AIBaseCommon {
 public:
 
 };
 
-class obj_ai_minion : public obj_ai_base {
+class AIMinionClient : public AIBaseCommon {
 public:
-	obj_ai_base* get_owner( );
+	AIBaseCommon* get_gold_redirect_target( );
 	bool is_lane_minion( );
 };
 
 template <class T>
-class manager_template {
+class ManagerTemplate {
 	PAD( 0x4 );
 public:
 	T** list;
-	size_t length;
-	size_t capacity;
-};
-
-template <class T>
-class manager_template_old {
-	PAD( 0x24 );
-public:
-	std::vector<T> list;
+	std::size_t length;
+	std::size_t capacity;
 };

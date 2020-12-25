@@ -40,9 +40,9 @@ std::once_flag change_skins;
 
 void skin_changer::update( ) {
 	auto league_module = std::uintptr_t( GetModuleHandle( nullptr ) );
-	auto player = *reinterpret_cast<obj_ai_base**>( league_module + offsets::global::Player );
-	auto heroes = *reinterpret_cast<manager_template<obj_ai_hero>**>( league_module + offsets::global::ManagerTemplate_AIHero_ );
-	auto minions = *reinterpret_cast<manager_template<obj_ai_minion>**>( league_module + offsets::global::ManagerTemplate_AIMinionClient_ );
+	auto player = *reinterpret_cast<AIBaseCommon**>( league_module + offsets::global::Player );
+	auto heroes = *reinterpret_cast<ManagerTemplate<AIHero>**>( league_module + offsets::global::ManagerTemplate_AIHero_ );
+	auto minions = *reinterpret_cast<ManagerTemplate<AIMinionClient>**>( league_module + offsets::global::ManagerTemplate_AIMinionClient_ );
 
 	// Change skins for champions when skin changer was loaded
 	//
@@ -55,7 +55,7 @@ void skin_changer::update( ) {
 		}
 
 		auto my_team = player ? player->get_team( ) : 100;
-		for ( size_t i = 0; i < heroes->length; i++ ) {
+		for ( std::size_t i = 0; i < heroes->length; i++ ) {
 			auto hero = heroes->list[ i ];
 			if ( hero == player )
 				continue;
@@ -77,7 +77,7 @@ void skin_changer::update( ) {
 		}
 		} );
 
-	for ( size_t i = 0; i < heroes->length; i++ ) {
+	for ( std::size_t i = 0; i < heroes->length; i++ ) {
 		auto hero = heroes->list[ i ];
 		// Fix for champions like elise with second form which is applied by pushing character data via server with original skinid we have to handle it
 		//
@@ -90,7 +90,7 @@ void skin_changer::update( ) {
 		}
 	}
 
-	static const auto change_skin_for_object = [ ] ( obj_ai_base* obj, int32_t skin ) -> void {
+	static const auto change_skin_for_object = [ ] ( AIBaseCommon* obj, std::int32_t skin ) -> void {
 		if ( skin == -1 )
 			return;
 
@@ -100,9 +100,9 @@ void skin_changer::update( ) {
 		}
 	};
 
-	for ( size_t i = 0; i < minions->length; i++ ) {
+	for ( std::size_t i = 0; i < minions->length; i++ ) {
 		auto minion = minions->list[ i ];
-		auto owner = minion->get_owner( );
+		auto owner = minion->get_gold_redirect_target( );
 
 		if ( owner ) {
 			// - TODO - better way
@@ -116,9 +116,9 @@ void skin_changer::update( ) {
 				|| hash == FNV( "YellowTrinket" )
 				|| hash == FNV( "VisionWard" ) ) {
 
-				// Change ward skin only for localplayer
+				// Change ward skin only for localplayer or for all if we are in replay mode
 				//
-				if ( owner == player )
+				if ( !player || owner == player )
 					change_skin_for_object( minion, config::current_ward_skin_index );
 
 				continue;
@@ -165,10 +165,10 @@ void skin_changer::init( ) {
 	// Wait for game to start
 	//
 	using namespace std::chrono_literals;
-	auto client = *reinterpret_cast<game_client**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
-	while ( !client || client->game_state != game_state_stage::running ) {
+	auto client = *reinterpret_cast<GameClient**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
+	while ( !client || client->game_state != GGameState_s::running ) {
 		std::this_thread::sleep_for( 100ms );
-		client = *reinterpret_cast<game_client**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
+		client = *reinterpret_cast<GameClient**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
 	}
 
 	std::this_thread::sleep_for( 500ms );

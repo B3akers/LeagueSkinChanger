@@ -180,9 +180,9 @@ namespace d3d_vtable {
 	}
 
 	void render( bool is_d3d11 = false ) {
-		auto client = *reinterpret_cast<game_client**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
+		auto client = *reinterpret_cast<GameClient**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
 
-		if ( client && client->game_state == game_state_stage::running ) {
+		if ( client && client->game_state == GGameState_s::running ) {
 			skin_changer::update( );
 
 			if ( menu_is_open ) {

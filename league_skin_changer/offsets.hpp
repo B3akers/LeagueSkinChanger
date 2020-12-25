@@ -62,7 +62,7 @@ namespace offsets {
 		extern uint32_t translateString_UNSAFE_DONOTUSE;
 		extern uint32_t CharacterDataStack__Push;
 		extern uint32_t CharacterDataStack__Update;
-		extern uint32_t GetOwnerObject;
+		extern uint32_t GetGoldRedirectTarget;
 		extern uint32_t CharacterData__GetCharacterPackage;
 	};
 };

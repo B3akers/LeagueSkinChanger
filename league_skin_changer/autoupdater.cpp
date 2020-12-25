@@ -288,7 +288,7 @@ std::vector<offset_signature> sigs = {
 		true,
 		false,
 		0,
-		&offsets::functions::GetOwnerObject
+		&offsets::functions::GetGoldRedirectTarget
 	},
 	{
 		{
