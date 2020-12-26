@@ -105,10 +105,29 @@ void skin_database::load( ) {
 	auto minion_skin_len = get_skins_len_for_model( "SRU_ChaosMinionMelee" ) / 2;
 	for ( auto i = skin_database::minions_skins.size( ); i < minion_skin_len; i++ )
 		skin_database::minions_skins.push_back( "Minion " + std::to_string( i ) );
+
+	//Summoners Emotes, hardcoded way
+	//TODO
+
+	for ( auto i = 0u; i < 10000; i++ )
+	{
+		auto emote = SummonerEmoteUserComponent::get_summoner_emote_data( i );
+		if ( !emote )
+			continue;
+
+		auto raw_name = std::string( emote->emote_name.str );
+		auto translated = std::string( translateString_UNSAFE_DONOTUSE( raw_name.c_str() ) );
+
+		if ( translated == raw_name )
+			continue;
+
+		summoner_emotes.push_back( { emote,  translated } );
+	}
 }
 
 std::map<uint32_t, std::vector<skin_database::skin_info>> skin_database::champions_skins;
 std::vector<std::pair<uint32_t, std::string>> skin_database::wards_skins;
+std::vector<std::pair<SummonerEmote*, std::string>> skin_database::summoner_emotes;
 
 std::vector<skin_database::jungle_mob_skin_info> skin_database::jungle_mobs_skins =
 {

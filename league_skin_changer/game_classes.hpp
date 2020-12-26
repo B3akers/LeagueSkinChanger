@@ -26,6 +26,9 @@
 #include <vector>
 #include <cinttypes>
 #include <string>
+#include <memory>
+#include <map>
+#include <unordered_map>
 
 #include "offsets.hpp"
 
@@ -33,31 +36,86 @@
 #define MACRO_CONCAT(x, y) CONCAT_IMPL(x, y)
 #define PAD(SIZE) uint8_t MACRO_CONCAT(_pad, __COUNTER__)[SIZE];
 
-namespace GGameState_s {
-	enum values {
-		loading_screen = 0,
-		connecting = 1,
-		running = 2,
-		oaused = 3,
-		finished = 4,
-		exiting = 5
-	};
+template <size_t Index, typename ReturnType, typename... Args>
+ReturnType call_virtual( void* instance, Args... args )
+{
+	using Fn = ReturnType( __thiscall* )( void*, Args... );
+
+	auto function = ( *reinterpret_cast< Fn** >( instance ) )[ Index ];
+	return function( instance, args... );
+}
+
+enum class GGameState_s : std::int32_t
+{
+	LoadingScreen = 0,
+	Connecting = 1,
+	Running = 2,
+	Poaused = 3,
+	Finished = 4,
+	Exiting = 5
 };
 
-class GameClient {
+enum class SummonerEmoteSlot : std::int32_t
+{
+	None = -1,
+	Top = 0,
+	Right = 1,
+	Bottom = 2,
+	Left = 3,
+	Middle = 4,
+	Start = 5,
+	Victory = 6,
+	First_Blood = 7,
+	Ace = 8,
+	Missing = 9
+};
+
+inline const char* SummonerEmoteSlot_to_string( SummonerEmoteSlot slot )
+{
+	switch ( slot )
+	{
+	case SummonerEmoteSlot::Top:
+		return "Top";
+	case SummonerEmoteSlot::Right:
+		return "Right";
+	case SummonerEmoteSlot::Bottom:
+		return "Bottom";
+	case SummonerEmoteSlot::Left:
+		return "Left";
+	case SummonerEmoteSlot::Middle:
+		return "Middle";
+	case SummonerEmoteSlot::Start:
+		return "Start";
+	case SummonerEmoteSlot::Victory:
+		return "Victory";
+	case SummonerEmoteSlot::First_Blood:
+		return "First_Blood";
+	case SummonerEmoteSlot::Ace:
+		return "Ace";
+	case SummonerEmoteSlot::Missing:
+		return "Missing";
+	default:
+		return "Unknown";
+	}
+}
+
+class GameClient
+{
 	PAD( 0x8 );
 public:
-	std::int32_t game_state;
+	GGameState_s game_state;
 };
 
-class AString {
+class AString
+{
 public:
 	const char* str;
 	std::size_t length;
 	std::size_t capacity;
 };
 
-class Champion {
+class Champion
+{
 public:
 	class Skin
 	{
@@ -74,13 +132,15 @@ public:
 	PAD( 0x8 );
 };
 
-class ChampionManager {
+class ChampionManager
+{
 	PAD( 0xC );
 public:
 	std::vector<Champion*> champions;
 };
 
-class CharacterStackData {
+class CharacterStackData
+{
 public:
 	AString model;
 	std::int32_t skin;
@@ -92,7 +152,8 @@ public:
 	PAD( 0xC );
 };
 
-class CharacterDataStack {
+class CharacterDataStack
+{
 public:
 	std::vector<CharacterStackData> stack;
 	CharacterStackData base_skin;
@@ -101,32 +162,73 @@ public:
 	void push( const char* model, std::int32_t skin );
 };
 
-class GameObject {
+class r3dTexture;
+
+class SummonerEmote
+{
 public:
-	std::string& name( ) { return *reinterpret_cast<std::string*>( std::uintptr_t( this ) + offsets::game_object::Name ); }
-	std::int32_t get_team( ) { return *reinterpret_cast< std::int32_t*>( std::uintptr_t( this ) + offsets::game_object::Team ); }
+	std::int32_t id;
+	PAD( 0x24 );
+	AString emote_name;
 };
 
-class AIBaseCommon : public GameObject {
+class SummonerEmoteUserComponent
+{
 public:
-	CharacterDataStack* get_character_data_stack( ) { return reinterpret_cast<CharacterDataStack*>( std::uintptr_t( this ) + offsets::ai_base::CharacterDataStack ); }
+	std::unordered_map<SummonerEmoteSlot, SummonerEmote*>& emotes( ) { return *reinterpret_cast< std::unordered_map<SummonerEmoteSlot, SummonerEmote*>* >( std::uintptr_t( this ) + offsets::SummonerEmoteUserComponent::Emotes ); }
+public:
+	void set_emote_id_for_slot( SummonerEmoteSlot slot, std::int32_t emote_id );
+public:
+	static SummonerEmote* get_summoner_emote_data( std::int32_t id );
+	static std::uintptr_t rtti;
+};
+
+class ComponentHost
+{
+private:
+	std::map<std::uintptr_t, void*>& components( ) { return *reinterpret_cast< std::map<std::uintptr_t, void*>* >( std::uintptr_t( this ) + offsets::ComponentHost::Components ); }
+public:
+	template<typename T>
+	T* get_component( )
+	{
+		auto compoment = this->components( ).find( T::rtti );
+		return compoment != this->components( ).end( ) ? *reinterpret_cast< T** >( *reinterpret_cast< std::uintptr_t* >( compoment->second ) + 0x0008 ) : nullptr;
+	}
+};
+
+class GameObject
+{
+public:
+	std::string& name( ) { return *reinterpret_cast< std::string* >( std::uintptr_t( this ) + offsets::GameObject::Name ); }
+	std::int32_t get_team( ) { return *reinterpret_cast< std::int32_t* >( std::uintptr_t( this ) + offsets::GameObject::Team ); }
+
+	ComponentHost* get_component_host( ) { return call_virtual<1, ComponentHost*>( this ); }
+};
+
+class AIBaseCommon : public GameObject
+{
+public:
+	CharacterDataStack* get_character_data_stack( ) { return reinterpret_cast< CharacterDataStack* >( std::uintptr_t( this ) + offsets::AIBaseCommon::CharacterDataStack ); }
 
 	void change_skin( const char* model, std::int32_t skin );
 };
 
-class AIHero : public AIBaseCommon {
+class AIHero : public AIBaseCommon
+{
 public:
 
 };
 
-class AIMinionClient : public AIBaseCommon {
+class AIMinionClient : public AIBaseCommon
+{
 public:
 	AIBaseCommon* get_gold_redirect_target( );
 	bool is_lane_minion( );
 };
 
 template <class T>
-class ManagerTemplate {
+class ManagerTemplate
+{
 	PAD( 0x4 );
 public:
 	T** list;

@@ -182,7 +182,7 @@ namespace d3d_vtable {
 	void render( bool is_d3d11 = false ) {
 		auto client = *reinterpret_cast<GameClient**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
 
-		if ( client && client->game_state == GGameState_s::running ) {
+		if ( client && client->game_state == GGameState_s::Running ) {
 			skin_changer::update( );
 
 			if ( menu_is_open ) {
@@ -270,8 +270,8 @@ using namespace d3d_vtable;
 
 void d3d_hook::hook( ) {
 	auto material_registry = reinterpret_cast<uintptr_t( __stdcall* )( )>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::Riot__Renderer__MaterialRegistry__GetSingletonPtr )( );
-	auto d3d_device = *reinterpret_cast<IDirect3DDevice9**>( material_registry + offsets::material_registry::D3DDevice );
-	auto swap_chain = *reinterpret_cast<IDXGISwapChain**>( material_registry + offsets::material_registry::SwapChain );
+	auto d3d_device = *reinterpret_cast<IDirect3DDevice9**>( material_registry + offsets::MaterialRegistry::D3DDevice );
+	auto swap_chain = *reinterpret_cast<IDXGISwapChain**>( material_registry + offsets::MaterialRegistry::SwapChain );
 
 	if ( d3d_device ) {
 		d3d_device_vmt = std::make_unique<::vmt_smart_hook>( d3d_device );

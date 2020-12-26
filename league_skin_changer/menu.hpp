@@ -38,6 +38,8 @@ namespace config {
 	extern std::map<uint32_t, int32_t> current_combo_enemy_skin_index;
 	extern std::map<uint32_t, int32_t> current_combo_jungle_mob_skin_index;
 
+	extern std::map<uint32_t, int32_t> current_summoner_emotes;
+
 	void save( );
 	void load( );
 	void reset( );

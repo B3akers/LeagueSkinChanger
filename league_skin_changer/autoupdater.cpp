@@ -33,71 +33,84 @@
 #include <thread>
 #include <chrono>
 
-uint8_t* find_signature( const wchar_t* szModule, const char* szSignature ) {
+uint8_t* find_signature( const wchar_t* szModule, const char* szSignature )
+{
 	auto module = GetModuleHandle( szModule );
-	static auto pattern_to_byte = [ ] ( const char* pattern ) {
-		auto bytes = std::vector<int> {};
-		auto start = const_cast<char*>( pattern );
-		auto end = const_cast<char*>( pattern ) + strlen( pattern );
+	static auto pattern_to_byte = [ ]( const char* pattern )
+	{
+		auto bytes = std::vector<int>{};
+		auto start = const_cast< char* >( pattern );
+		auto end = const_cast< char* >( pattern ) + strlen( pattern );
 
-		for ( auto current = start; current < end; ++current ) {
-			if ( *current == '?' ) {
+		for ( auto current = start; current < end; ++current )
+		{
+			if ( *current == '?' )
+			{
 				++current;
 				if ( *current == '?' )
 					++current;
 				bytes.push_back( -1 );
-			} else {
+			} else
+			{
 				bytes.push_back( strtoul( current, &current, 16 ) );
 			}
 		}
 		return bytes;
 	};
 
-	auto dosHeader = (PIMAGE_DOS_HEADER)module;
-	auto ntHeaders = (PIMAGE_NT_HEADERS)( (uint8_t*)module + dosHeader->e_lfanew );
+	auto dosHeader = ( PIMAGE_DOS_HEADER ) module;
+	auto ntHeaders = ( PIMAGE_NT_HEADERS ) ( ( uint8_t* ) module + dosHeader->e_lfanew );
 	auto textSection = IMAGE_FIRST_SECTION( ntHeaders );
 
 	auto sizeOfImage = textSection->SizeOfRawData;
 	auto patternBytes = pattern_to_byte( szSignature );
-	auto scanBytes = reinterpret_cast<uint8_t*>( module ) + textSection->VirtualAddress;
+	auto scanBytes = reinterpret_cast< uint8_t* >( module ) + textSection->VirtualAddress;
 
 	auto s = patternBytes.size( );
 	auto d = patternBytes.data( );
 
-	auto mbi = MEMORY_BASIC_INFORMATION { 0 };
+	auto mbi = MEMORY_BASIC_INFORMATION{ 0 };
 	uint8_t* next_check_address = 0;
 
-	for ( auto i = 0ul; i < sizeOfImage - s; ++i ) {
+	for ( auto i = 0ul; i < sizeOfImage - s; ++i )
+	{
 		bool found = true;
-		for ( auto j = 0ul; j < s; ++j ) {
+		for ( auto j = 0ul; j < s; ++j )
+		{
 			auto current_address = scanBytes + i + j;
-			if ( current_address >= next_check_address ) {
-				if ( !VirtualQuery( reinterpret_cast<void*>( current_address ), &mbi, sizeof( mbi ) ) )
+			if ( current_address >= next_check_address )
+			{
+				if ( !VirtualQuery( reinterpret_cast< void* >( current_address ), &mbi, sizeof( mbi ) ) )
 					break;
 
-				if ( mbi.Protect == PAGE_NOACCESS ) {
+				if ( mbi.Protect == PAGE_NOACCESS )
+				{
 					i += ( ( std::uintptr_t( mbi.BaseAddress ) + mbi.RegionSize ) - ( std::uintptr_t( scanBytes ) + i ) );
 					i--;
 					found = false;
 					break;
-				} else {
-					next_check_address = reinterpret_cast<uint8_t*>( mbi.BaseAddress ) + mbi.RegionSize;
+				} else
+				{
+					next_check_address = reinterpret_cast< uint8_t* >( mbi.BaseAddress ) + mbi.RegionSize;
 				}
 			}
 
-			if ( scanBytes[ i + j ] != d[ j ] && d[ j ] != -1 ) {
+			if ( scanBytes[ i + j ] != d[ j ] && d[ j ] != -1 )
+			{
 				found = false;
 				break;
 			}
 		}
-		if ( found ) {
+		if ( found )
+		{
 			return &scanBytes[ i ];
 		}
 	}
 	return nullptr;
 }
 
-class offset_signature {
+class offset_signature
+{
 public:
 	std::vector<std::string> sigs;
 	bool sub_base;
@@ -191,7 +204,7 @@ std::vector<offset_signature> sigs = {
 		false,
 		true,
 		0,
-		&offsets::ai_base::CharacterDataStack
+		&offsets::AIBaseCommon::CharacterDataStack
 	},
 	{
 		{
@@ -200,7 +213,7 @@ std::vector<offset_signature> sigs = {
 		false,
 		true,
 		0,
-		&offsets::ai_base::SkinId
+		&offsets::AIBaseCommon::SkinId
 	},
 	{
 		{
@@ -211,7 +224,7 @@ std::vector<offset_signature> sigs = {
 		false,
 		true,
 		0,
-		&offsets::material_registry::D3DDevice
+		&offsets::MaterialRegistry::D3DDevice
 	},
 	{
 		{
@@ -221,7 +234,7 @@ std::vector<offset_signature> sigs = {
 		false,
 		true,
 		0,
-		&offsets::material_registry::SwapChain
+		&offsets::MaterialRegistry::SwapChain
 	},
 	{
 		{
@@ -235,7 +248,7 @@ std::vector<offset_signature> sigs = {
 		false,
 		true,
 		-1,
-		&offsets::ai_minion::IsLaneMinion
+		&offsets::AIMinionClient::IsLaneMinion
 	},
 	{
 		{
@@ -299,10 +312,39 @@ std::vector<offset_signature> sigs = {
 		false,
 		0,
 		&offsets::functions::CharacterData__GetCharacterPackage
+	},
+	{
+		{
+			"C7 44 24 1C ? ? ? ? 8D 44 24 1C 8B CE 50 8D 44 24 10"
+		},
+		false,
+		true,
+		0,
+		&SummonerEmoteUserComponent::rtti
+	},
+	{
+		{
+			"81 EC ? ? ? ? A1 ? ? ? ? 33 C4 89 84 24 ? ? ? ? 56 FF B4 24 ? ? ? ? 8D 44 24 14",
+			"E8 ? ? ? ? 83 C4 04 85 C0 74 65 57"
+		},
+		true,
+		false,
+		0,
+		&offsets::functions::SummonerEmoteUserComponent__GetSummonerEmoteData
+	},
+	{
+		{
+			"83 EC 08 56 57 FF 74 24 14"
+		},
+		true,
+		false,
+		0,
+		&offsets::functions::SummonerEmoteUserComponent__SetEmoteIdForSlot
 	}
 };
 
-void autoupdater::start( ) {
+void autoupdater::start( )
+{
 	auto base = std::uintptr_t( GetModuleHandle( nullptr ) );
 
 	//Invalid all
@@ -310,43 +352,48 @@ void autoupdater::start( ) {
 	for ( auto& sig : sigs )
 		*sig.offset = 0;
 
-	while ( true ) {
+	while ( true )
+	{
 		auto missing_offset = false;
-		for ( auto& sig : sigs ) {
+		for ( auto& sig : sigs )
+		{
 
 			if ( *sig.offset != 0 )
 				continue;
 
-			for ( auto& pattern : sig.sigs ) {
+			for ( auto& pattern : sig.sigs )
+			{
 				auto address = find_signature( nullptr, pattern.c_str( ) );
 
-				if ( !address ) {
+				if ( !address )
+				{
 #ifdef DEBUG
-					printf( "Signature failed: %s\n", pattern.c_str());
+					printf( "Signature failed: %s\n", pattern.c_str( ) );
 #endif
 					continue;
 				}
 				if ( sig.read )
-					address = *reinterpret_cast<uint8_t**>( address + ( pattern.find_first_of( "?" ) / 3 ) );
+					address = *reinterpret_cast< uint8_t** >( address + ( pattern.find_first_of( "?" ) / 3 ) );
 				else if ( address[ 0 ] == 0xE8 )
-					address = address + *reinterpret_cast<uint32_t*>( address + 1 ) + 5;
+					address = address + *reinterpret_cast< uint32_t* >( address + 1 ) + 5;
 
 				if ( sig.sub_base )
 					address -= base;
 
 				address += sig.additional;
 
-				*sig.offset = reinterpret_cast<uint32_t>( address );
+				*sig.offset = reinterpret_cast< uint32_t >( address );
 				break;
 			}
 
-			if ( !*sig.offset ) {
+			if ( !*sig.offset )
+			{
 				missing_offset = true;
 				break;
 			}
 		}
 
-		if ( !missing_offset)
+		if ( !missing_offset )
 			break;
 
 		using namespace std::chrono_literals;

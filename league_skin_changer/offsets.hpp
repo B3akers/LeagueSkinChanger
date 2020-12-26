@@ -25,44 +25,70 @@
 #pragma once
 #include <cinttypes>
 
-namespace offsets {
-	namespace game_object {
-		enum {
+namespace offsets
+{
+	namespace GameObject
+	{
+		enum
+		{
 			Name = 0x6C,
 			Team = 0x4C
 		};
 	};
 
-	namespace global {
-		extern uint32_t Player;
-		extern uint32_t ChampionManager;
-		extern uint32_t Riot__g_window;
-		extern uint32_t GfxWinMsgProc;
-		extern uint32_t ManagerTemplate_AIMinionClient_;
-		extern uint32_t ManagerTemplate_AIHero_;
-		extern uint32_t GameClient;
+	namespace ComponentHost
+	{
+		enum
+		{
+			Components = 0x00
+		};
+	}
+
+	namespace SummonerEmoteUserComponent
+	{
+		enum
+		{
+			Emotes = 0x000C
+		};
+	}
+
+	namespace global
+	{
+		extern std::uint32_t Player;
+		extern std::uint32_t ChampionManager;
+		extern std::uint32_t Riot__g_window;
+		extern std::uint32_t GfxWinMsgProc;
+		extern std::uint32_t ManagerTemplate_AIMinionClient_;
+		extern std::uint32_t ManagerTemplate_AIHero_;
+		extern std::uint32_t GameClient;
 	};
 
-	namespace ai_base {
-		extern uint32_t CharacterDataStack;
-		extern uint32_t SkinId;
+	namespace AIBaseCommon
+	{
+		extern std::uint32_t CharacterDataStack;
+		extern std::uint32_t SkinId;
 	};
 
-	namespace material_registry {
-		extern uint32_t D3DDevice;
-		extern uint32_t SwapChain;
+	namespace MaterialRegistry
+	{
+		extern std::uint32_t D3DDevice;
+		extern std::uint32_t SwapChain;
 	};
 
-	namespace ai_minion {
-		extern uint32_t IsLaneMinion;
+	namespace AIMinionClient
+	{
+		extern std::uint32_t IsLaneMinion;
 	};
 
-	namespace functions {
-		extern uint32_t Riot__Renderer__MaterialRegistry__GetSingletonPtr;
-		extern uint32_t translateString_UNSAFE_DONOTUSE;
-		extern uint32_t CharacterDataStack__Push;
-		extern uint32_t CharacterDataStack__Update;
-		extern uint32_t GetGoldRedirectTarget;
-		extern uint32_t CharacterData__GetCharacterPackage;
+	namespace functions
+	{
+		extern std::uint32_t Riot__Renderer__MaterialRegistry__GetSingletonPtr;
+		extern std::uint32_t translateString_UNSAFE_DONOTUSE;
+		extern std::uint32_t CharacterDataStack__Push;
+		extern std::uint32_t CharacterDataStack__Update;
+		extern std::uint32_t GetGoldRedirectTarget;
+		extern std::uint32_t CharacterData__GetCharacterPackage;
+		extern std::uint32_t SummonerEmoteUserComponent__GetSummonerEmoteData;
+		extern std::uint32_t SummonerEmoteUserComponent__SetEmoteIdForSlot;
 	};
 };

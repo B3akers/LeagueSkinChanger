@@ -28,6 +28,8 @@
 #include <cinttypes>
 #include <vector>
 
+class SummonerEmote;
+
 namespace skin_database {
 
 	class skin_info {
@@ -52,5 +54,7 @@ namespace skin_database {
 
 	extern std::vector<jungle_mob_skin_info> jungle_mobs_skins;
 	extern std::vector<std::string> minions_skins;
+
+	extern std::vector<std::pair<SummonerEmote*, std::string>> summoner_emotes;
 };
 
