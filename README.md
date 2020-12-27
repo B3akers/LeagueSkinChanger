@@ -22,6 +22,9 @@
 
 # Usage
 1. Use `league_skin_injector` or inject the resulting DLL into the game yourself.
+   - *Administrator* privilege may be needed if failed to inject.
+   - League client can crash if injected before going into arena.
+      - A workaround is to not inject until you are in the arena (you will need to be fast to not disrupt the game).
 2. Press <kbd>Insert</kbd> to bring up the menu.
 3. Select skin for you, your teammates, enemies, wards, etc.
 
