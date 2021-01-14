@@ -57,7 +57,6 @@ namespace offsets
 		extern std::uint32_t Player;
 		extern std::uint32_t ChampionManager;
 		extern std::uint32_t Riot__g_window;
-		extern std::uint32_t GfxWinMsgProc;
 		extern std::uint32_t ManagerTemplate_AIMinionClient_;
 		extern std::uint32_t ManagerTemplate_AIHero_;
 		extern std::uint32_t GameClient;

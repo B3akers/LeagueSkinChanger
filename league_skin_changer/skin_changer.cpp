@@ -63,7 +63,9 @@ void skin_changer::update( )
 				{
 					for ( auto& it : config::current_summoner_emotes )
 					{
-						summoner_component->set_emote_id_for_slot( ( SummonerEmoteSlot ) it.first, it.second );
+						auto emote_slot = summoner_component->emotes().find((SummonerEmoteSlot)it.first);
+						if(emote_slot != summoner_component->emotes().end() && emote_slot->second != nullptr)
+							summoner_component->set_emote_id_for_slot( ( SummonerEmoteSlot ) it.first, it.second );
 					}
 				}
 			}

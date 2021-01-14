@@ -49,9 +49,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hWnd, UINT ms
 
 bool menu_is_open = false;
 
-using riot_wndproc = LRESULT( __cdecl* )( HWND, UINT, WPARAM, LPARAM );
-riot_wndproc original_wndproc;
-LRESULT __cdecl wnd_proc( HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param ) {
+LONG_PTR original_wndproc;
+LRESULT __stdcall wnd_proc( HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param ) {
 	if ( ImGui_ImplWin32_WndProcHandler( hwnd, msg, w_param, l_param ) )
 		return true;
 
@@ -61,7 +60,7 @@ LRESULT __cdecl wnd_proc( HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param ) 
 			config::save( );
 	}
 
-	return original_wndproc( hwnd, msg, w_param, l_param );
+	return reinterpret_cast<WNDPROC>(original_wndproc)(hwnd, msg, w_param, l_param);
 }
 
 std::once_flag init_device;
@@ -141,7 +140,13 @@ namespace d3d_vtable {
 	void create_render_target( ) {
 		ID3D11Texture2D* back_buffer;
 		p_swap_chain->GetBuffer( 0, IID_PPV_ARGS( &back_buffer ) );
-		d3d11_device->CreateRenderTargetView( back_buffer, NULL, &main_render_target_view );
+
+		D3D11_RENDER_TARGET_VIEW_DESC desc = {};
+		memset(&desc, 0, sizeof(desc));
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+		d3d11_device->CreateRenderTargetView( back_buffer, &desc, &main_render_target_view );
 		back_buffer->Release( );
 	}
 
@@ -175,11 +180,10 @@ namespace d3d_vtable {
 		} else
 			ImGui_ImplDX9_Init( reinterpret_cast<IDirect3DDevice9*>( device ) );
 
-		original_wndproc = *reinterpret_cast<riot_wndproc*>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GfxWinMsgProc );
-		*reinterpret_cast<riot_wndproc*>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GfxWinMsgProc ) = wnd_proc;
+		original_wndproc = SetWindowLongPtr(*reinterpret_cast<HWND*>(std::uintptr_t(GetModuleHandle(nullptr)) + offsets::global::Riot__g_window), GWLP_WNDPROC, (LONG_PTR)wnd_proc);
 	}
 
-	void render( bool is_d3d11 = false ) {
+	void render( void* device, bool is_d3d11 = false ) {
 		auto client = *reinterpret_cast<GameClient**>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
 
 		if ( client && client->game_state == GGameState_s::Running ) {
@@ -201,8 +205,20 @@ namespace d3d_vtable {
 				if ( is_d3d11 ) {
 					d3d11_device_context->OMSetRenderTargets( 1, &main_render_target_view, NULL );
 					ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData( ) );
-				} else
-					ImGui_ImplDX9_RenderDrawData( ImGui::GetDrawData( ) );
+				}
+				else {
+					unsigned long colorwrite, srgbwrite;
+					reinterpret_cast<IDirect3DDevice9*>(device)->GetRenderState(D3DRS_COLORWRITEENABLE, &colorwrite);
+					reinterpret_cast<IDirect3DDevice9*>(device)->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbwrite);
+
+					reinterpret_cast<IDirect3DDevice9*>(device)->SetRenderState(D3DRS_COLORWRITEENABLE, 0xffffffff);
+					reinterpret_cast<IDirect3DDevice9*>(device)->SetRenderState(D3DRS_SRGBWRITEENABLE, false);
+
+					ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+
+					reinterpret_cast<IDirect3DDevice9*>(device)->SetRenderState(D3DRS_COLORWRITEENABLE, colorwrite);
+					reinterpret_cast<IDirect3DDevice9*>(device)->SetRenderState(D3DRS_SRGBWRITEENABLE, srgbwrite);
+				}
 			}
 		}
 	}
@@ -214,7 +230,7 @@ namespace d3d_vtable {
 				init_imgui( p_swap_chain, true );
 				} );
 
-			render( true );
+			render(p_swap_chain, true );
 
 			return m_original( p_swap_chain, sync_interval, flags );
 		}
@@ -241,7 +257,7 @@ namespace d3d_vtable {
 				init_imgui( p_device );
 				} );
 
-			render( );
+			render(p_device);
 
 			return m_original( p_device );
 		}
@@ -285,7 +301,8 @@ void d3d_hook::hook( ) {
 }
 
 void d3d_hook::unhook( ) {
-	*reinterpret_cast<riot_wndproc*>( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GfxWinMsgProc ) = original_wndproc;
+	SetWindowLongPtr(*reinterpret_cast<HWND*>(std::uintptr_t(GetModuleHandle(nullptr)) + offsets::global::Riot__g_window), GWLP_WNDPROC, original_wndproc);
+
 	if ( d3d_device_vmt )
 		d3d_device_vmt->unhook( );
 	if ( swap_chain_vmt )

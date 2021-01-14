@@ -44,8 +44,8 @@ void SummonerEmoteUserComponent::set_emote_id_for_slot( SummonerEmoteSlot slot, 
 
 void CharacterDataStack::push( const char* model, std::int32_t skin )
 {
-	static const auto Push = reinterpret_cast< int( __thiscall* )( void*, const char* model, std::int32_t skinid, std::int32_t, bool update_spells, bool dont_update_hud, bool, bool change_particle, bool, char, const char*, std::int32_t, const char*, std::int32_t ) >( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::CharacterDataStack__Push );
-	Push( this, model, skin, 0, false, false, false, true, false, -1, "\x00", 0, "\x00", 0 );
+	static const auto Push = reinterpret_cast< int( __thiscall* )( void*, const char* model, std::int32_t skinid, std::int32_t, bool update_spells, bool dont_update_hud, bool, bool change_particle, bool, char, const char*, std::int32_t, const char*, std::int32_t, bool, std::int32_t ) >( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::functions::CharacterDataStack__Push );
+	Push( this, model, skin, 0, false, false, false, true, false, -1, "\x00", 0, "\x00", 0 , false, 1);
 }
 
 void CharacterDataStack::update( bool change )

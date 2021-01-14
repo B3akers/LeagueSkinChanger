@@ -188,18 +188,7 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"A1 ? ? ? ? 55 57 53",
-			"A1 ? ? ? ? 53 55 57 85 C0"
-		},
-		true,
-		true,
-		0,
-		&offsets::global::GfxWinMsgProc
-	},
-	{
-		{
-			"8D 8E ? ? ? ? FF 74 24 5C",
-			"8D 8E ? ? ? ? FF 74 24 58"
+			"8D 8E ? ? ? ? FF 74 24 48"
 		},
 		false,
 		true,
@@ -252,9 +241,8 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"83 EC 4C 53 55 56 57 8B F9",
-			"83 EC 0C 53 55 56 57 8B F9 8B 47 04",
-			"E8 ? ? ? ? 8B 74 24 14 85 F6 74 1E 8B C7 F0 0F C1 46 ? 75 15 8B 06 8B CE FF 10 F0 0F C1 7E ? 4F 75 07 8B 06 8B CE FF 50 04 5F 5E 5B"
+			"83 EC 4C 53 57",
+			"E8 ? ? ? ? 8B 74 24 14 85 F6 74 1E 8B C7 F0 0F C1 46 ? 75 15 8B 06 8B CE FF 10 F0 0F C1 7E ? 4F 75 07 8B 06 8B CE FF 50 04 5F 5E 5B 83 C4 14 C2 40 00"
 		},
 		true,
 		false,

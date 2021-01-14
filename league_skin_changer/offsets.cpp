@@ -28,7 +28,6 @@ namespace offsets {
 		std::uint32_t Player = 0;
 		std::uint32_t ChampionManager = 0;
 		std::uint32_t Riot__g_window = 0;
-		std::uint32_t GfxWinMsgProc = 0;
 		std::uint32_t ManagerTemplate_AIMinionClient_ = 0;
 		std::uint32_t ManagerTemplate_AIHero_ = 0;
 		std::uint32_t GameClient = 0;
