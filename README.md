@@ -18,7 +18,7 @@
 
 # Building
 1. Clone the source with `git clone --recursive https://github.com/B3akers/LeagueSkinChanger.git`
-2. Build in Visual Studio 2017/19 with configuration "Any | x86" (build will fail if set to "x64")
+2. Build in Visual Studio 2017/19 with configuration "Release | x86" (build will fail if set to "x64" or "Debug")
 
 # Usage
 1. Use `league_skin_injector` or inject the resulting DLL into the game yourself.
