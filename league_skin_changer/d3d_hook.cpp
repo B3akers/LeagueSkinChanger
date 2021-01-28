@@ -140,13 +140,7 @@ namespace d3d_vtable {
 	void create_render_target( ) {
 		ID3D11Texture2D* back_buffer;
 		p_swap_chain->GetBuffer( 0, IID_PPV_ARGS( &back_buffer ) );
-
-		D3D11_RENDER_TARGET_VIEW_DESC desc = {};
-		memset(&desc, 0, sizeof(desc));
-		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-
-		d3d11_device->CreateRenderTargetView( back_buffer, &desc, &main_render_target_view );
+		d3d11_device->CreateRenderTargetView( back_buffer, NULL, &main_render_target_view );
 		back_buffer->Release( );
 	}
 
