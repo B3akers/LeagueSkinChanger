@@ -60,7 +60,7 @@ LRESULT __stdcall wnd_proc( HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param 
 			config::save( );
 	}
 
-	return reinterpret_cast<WNDPROC>(original_wndproc)(hwnd, msg, w_param, l_param);
+	return CallWindowProcW( ( WNDPROC ) original_wndproc, hwnd, msg, w_param, l_param );
 }
 
 std::once_flag init_device;
