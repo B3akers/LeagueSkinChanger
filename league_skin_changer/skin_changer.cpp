@@ -38,190 +38,209 @@
 
 std::once_flag change_skins;
 
-void skin_changer::update( )
+void skin_changer::update()
 {
-	auto league_module = std::uintptr_t( GetModuleHandle( nullptr ) );
-	auto player = *reinterpret_cast< AIBaseCommon** >( league_module + offsets::global::Player );
-	auto heroes = *reinterpret_cast< ManagerTemplate<AIHero>** >( league_module + offsets::global::ManagerTemplate_AIHero_ );
-	auto minions = *reinterpret_cast< ManagerTemplate<AIMinionClient>** >( league_module + offsets::global::ManagerTemplate_AIMinionClient_ );
+	auto league_module = std::uintptr_t(GetModuleHandle(nullptr));
+	auto player = *reinterpret_cast<AIBaseCommon**>(league_module + offsets::global::Player);
+	auto heroes = *reinterpret_cast<ManagerTemplate<AIHero>**>(league_module + offsets::global::ManagerTemplate_AIHero_);
+	auto minions = *reinterpret_cast<ManagerTemplate<AIMinionClient>**>(league_module + offsets::global::ManagerTemplate_AIMinionClient_);
 
 	// Change skins for champions when skin changer was loaded
 	//
-	std::call_once( change_skins, [ & ]( )
+	std::call_once(change_skins, [&]()
 		{
-			if ( player )
+			if (player)
 			{
-				if ( config::current_combo_skin_index > 0 )
+				if (config::current_combo_skin_index > 0)
 				{
-					auto& values = skin_database::champions_skins[ fnv::hash_runtime( player->get_character_data_stack( )->base_skin.model.str ) ];
-					player->change_skin( values[ config::current_combo_skin_index - 1 ].model_name.c_str( ), values[ config::current_combo_skin_index - 1 ].skin_id );
+					auto& values = skin_database::champions_skins[fnv::hash_runtime(player->get_character_data_stack()->base_skin.model.str)];
+					player->change_skin(values[config::current_combo_skin_index - 1].model_name.c_str(), values[config::current_combo_skin_index - 1].skin_id);
 				}
 
-				auto summoner_component = player->get_component_host( )->get_component<SummonerEmoteUserComponent>( );
+				auto summoner_component = player->get_component_host()->get_component<SummonerEmoteUserComponent>();
 
-				if ( summoner_component )
+				if (summoner_component)
 				{
-					for ( auto& it : config::current_summoner_emotes )
+					for (auto& it : config::current_summoner_emotes)
 					{
 						auto emote_slot = summoner_component->emotes().find((SummonerEmoteSlot)it.first);
-						if(emote_slot != summoner_component->emotes().end() && emote_slot->second != nullptr)
-							summoner_component->set_emote_id_for_slot( ( SummonerEmoteSlot ) it.first, it.second );
+						if (emote_slot != summoner_component->emotes().end() && emote_slot->second != nullptr)
+							summoner_component->set_emote_id_for_slot((SummonerEmoteSlot)it.first, it.second);
 					}
 				}
 			}
 
-			auto my_team = player ? player->get_team( ) : 100;
-			for ( std::size_t i = 0; i < heroes->length; i++ )
+			auto my_team = player ? player->get_team() : 100;
+			for (std::size_t i = 0; i < heroes->length; i++)
 			{
-				auto hero = heroes->list[ i ];
-				if ( hero == player )
+				auto hero = heroes->list[i];
+				if (hero == player)
 					continue;
 
-				auto is_enemy = my_team != hero->get_team( );
+				auto is_enemy = my_team != hero->get_team();
 
 				auto& config_array = is_enemy ? config::current_combo_enemy_skin_index : config::current_combo_ally_skin_index;
 
-				auto champion_name_hash = fnv::hash_runtime( hero->get_character_data_stack( )->base_skin.model.str );
+				auto champion_name_hash = fnv::hash_runtime(hero->get_character_data_stack()->base_skin.model.str);
 
-				auto config_entry = config_array.find( champion_name_hash );
-				if ( config_entry == config_array.end( ) )
+				auto config_entry = config_array.find(champion_name_hash);
+				if (config_entry == config_array.end())
 					continue;
 
-				if ( config_entry->second > 0 )
+				if (config_entry->second > 0)
 				{
-					auto& values = skin_database::champions_skins[ champion_name_hash ];
-					hero->change_skin( values[ config_entry->second - 1 ].model_name.c_str( ), values[ config_entry->second - 1 ].skin_id );
+					auto& values = skin_database::champions_skins[champion_name_hash];
+					hero->change_skin(values[config_entry->second - 1].model_name.c_str(), values[config_entry->second - 1].skin_id);
 				}
 			}
-		} );
+		});
 
-	for ( std::size_t i = 0; i < heroes->length; i++ )
+	for (std::size_t i = 0; i < heroes->length; i++)
 	{
-		auto hero = heroes->list[ i ];
+		auto hero = heroes->list[i];
 		// Fix for champions like elise with second form which is applied by pushing character data via server with original skinid we have to handle it
 		//
-		if ( hero->get_character_data_stack( )->stack.size( ) > 0 )
+		if (hero->get_character_data_stack()->stack.size() > 0)
 		{
-			auto& last = hero->get_character_data_stack( )->stack.back( );
-			if ( last.skin != hero->get_character_data_stack( )->base_skin.skin )
+			auto& last = hero->get_character_data_stack()->stack.back();
+			if (last.skin != hero->get_character_data_stack()->base_skin.skin)
 			{
-				last.skin = hero->get_character_data_stack( )->base_skin.skin;
-				hero->get_character_data_stack( )->update( true );
+				last.skin = hero->get_character_data_stack()->base_skin.skin;
+				hero->get_character_data_stack()->update(true);
 			}
 		}
 	}
 
-	static const auto change_skin_for_object = [ ]( AIBaseCommon* obj, std::int32_t skin ) -> void
+	static const auto change_skin_for_object = [](AIBaseCommon* obj, std::int32_t skin) -> void
 	{
-		if ( skin == -1 )
+		if (skin == -1)
 			return;
 
-		if ( obj->get_character_data_stack( )->base_skin.skin != skin )
+		if (obj->get_character_data_stack()->base_skin.skin != skin)
 		{
-			obj->get_character_data_stack( )->base_skin.skin = skin;
-			obj->get_character_data_stack( )->update( true );
+			obj->get_character_data_stack()->base_skin.skin = skin;
+			obj->get_character_data_stack()->update(true);
 		}
 	};
 
-	for ( std::size_t i = 0; i < minions->length; i++ )
+	for (std::size_t i = 0; i < minions->length; i++)
 	{
-		auto minion = minions->list[ i ];
-		auto owner = minion->get_gold_redirect_target( );
+		auto minion = minions->list[i];
+		auto owner = minion->get_gold_redirect_target();
 
-		if ( owner )
+		if (owner)
 		{
 			// - TODO - better way
 			//
 
 			// Objects like nidalee trap, illaoi mace are wards by riot so we need to check it by names
 			//
-			auto hash = fnv::hash_runtime( minion->get_character_data_stack( )->base_skin.model.str );
-			if ( hash == FNV( "JammerDevice" )
-				|| hash == FNV( "SightWard" )
-				|| hash == FNV( "YellowTrinket" )
-				|| hash == FNV( "VisionWard" ) )
+			auto hash = fnv::hash_runtime(minion->get_character_data_stack()->base_skin.model.str);
+			if (hash == FNV("JammerDevice")
+				|| hash == FNV("SightWard")
+				|| hash == FNV("YellowTrinket")
+				|| hash == FNV("VisionWard"))
 			{
 
 				// Change ward skin only for localplayer or for all if we are in replay mode
 				//
-				if ( !player || owner == player )
-					change_skin_for_object( minion, config::current_ward_skin_index );
+				if (!player || owner == player)
+					change_skin_for_object(minion, config::current_ward_skin_index);
 
 				continue;
 			}
 
 			// Change skins for minions created by player
 			//
-			change_skin_for_object( minion, owner->get_character_data_stack( )->base_skin.skin );
-		} else
+			change_skin_for_object(minion, owner->get_character_data_stack()->base_skin.skin);
+		}
+		else
 		{
-			if ( minion->is_lane_minion( ) )
+			if (minion->is_lane_minion())
 			{
 				// Change skin for lane minions
 				//
 
-				if ( player && player->get_team( ) == 200 )
-					change_skin_for_object( minion, config::current_minion_skin_index * 2 + 1 );
+				if (player && player->get_team() == 200)
+					change_skin_for_object(minion, config::current_minion_skin_index * 2 + 1);
 				else
-					change_skin_for_object( minion, config::current_minion_skin_index * 2 );
-			} else
+					change_skin_for_object(minion, config::current_minion_skin_index * 2);
+			}
+			else
 			{
 				// Change skin for other minions like baron, blue etc.
 				//
 
-				auto hash = fnv::hash_runtime( minion->get_character_data_stack( )->base_skin.model.str );
-				auto config_entry = config::current_combo_jungle_mob_skin_index.find( hash );
-				if ( config_entry == config::current_combo_jungle_mob_skin_index.end( ) || config_entry->second == 0 )
+				auto hash = fnv::hash_runtime(minion->get_character_data_stack()->base_skin.model.str);
+				auto config_entry = config::current_combo_jungle_mob_skin_index.find(hash);
+				if (config_entry == config::current_combo_jungle_mob_skin_index.end() || config_entry->second == 0)
 					continue;
 
-				change_skin_for_object( minion, config_entry->second - 1 );
+				change_skin_for_object(minion, config_entry->second - 1);
 			}
 
 		}
 	}
 }
 
-void skin_changer::init( )
+void skin_changer::init()
 {
 #ifdef DEBUG
-	AllocConsole( );
-	freopen( "CONIN$", "r", stdin );
-	freopen( "CONOUT$", "w", stdout );
-	freopen( "CONOUT$", "w", stderr );
+	AllocConsole();
+	freopen("CONIN$", "r", stdin);
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
 #endif
 
-	autoupdater::start( );
+	// Load only GameClient Signature first, to game not crashe
+	autoupdater::start(true);
 
 	// Wait for game to start
 	//
 	using namespace std::chrono_literals;
-	auto client = *reinterpret_cast< GameClient** >( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
-	while ( !client || client->game_state != GGameState_s::Running )
+	auto client = *reinterpret_cast<GameClient**>(std::uintptr_t(GetModuleHandle(nullptr)) + offsets::global::GameClient);
+	while (!client || client->game_state != GGameState_s::Running)
 	{
-		std::this_thread::sleep_for( 100ms );
-		client = *reinterpret_cast< GameClient** >( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
+#ifdef DEBUG
+		switch (client->game_state)
+		{
+		case GGameState_s::LoadingScreen:
+			printf("Loading screen.\n");
+			break;
+		default:
+			printf("Unknown Game State.\n");
+			break;
+		}
+#endif
+		std::this_thread::sleep_for(2s);
+		client = *reinterpret_cast<GameClient**>(std::uintptr_t(GetModuleHandle(nullptr)) + offsets::global::GameClient);
 	}
 
-	std::this_thread::sleep_for( 500ms );
+	std::this_thread::sleep_for(500ms);
 
-	config::load( );
-	d3d_hook::hook( );
+	// Now load others signature.
+	autoupdater::start(false);
 
-	while ( true )
+	std::this_thread::sleep_for(100ms);
+
+	config::load();
+	d3d_hook::hook();
+
+	while (true)
 	{
 
-		if ( GetAsyncKeyState( VK_F7 ) )
+		if (GetAsyncKeyState(VK_F7))
 			break;
 
 		using namespace std::chrono_literals;
-		std::this_thread::sleep_for( 200ms );
+		std::this_thread::sleep_for(200ms);
 	}
 
-	d3d_hook::unhook( );
+	d3d_hook::unhook();
 #ifdef DEBUG
-	FreeConsole( );
+	FreeConsole();
 #endif
-	FreeLibraryAndExitThread( my_module, 0 );
+	FreeLibraryAndExitThread(my_module, 0);
 }
 
 HMODULE skin_changer::my_module;

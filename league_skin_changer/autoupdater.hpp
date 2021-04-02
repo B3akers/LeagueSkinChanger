@@ -23,7 +23,7 @@
 * SOFTWARE.
 */
 #pragma once
-namespace autoupdater { 
-	void start( );
+namespace autoupdater {
+	void start(bool loadSimple = true);
 };
 
