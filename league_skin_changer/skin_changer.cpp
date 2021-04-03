@@ -190,7 +190,8 @@ void skin_changer::init( )
 	freopen( "CONOUT$", "w", stderr );
 #endif
 
-	autoupdater::start( );
+	// First load only gameClient signature to game not crashes.
+	autoupdater::start( true );
 
 	// Wait for game to start
 	//
@@ -198,11 +199,30 @@ void skin_changer::init( )
 	auto client = *reinterpret_cast< GameClient** >( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
 	while ( !client || client->game_state != GGameState_s::Running )
 	{
-		std::this_thread::sleep_for( 100ms );
+#ifdef DEBUG
+		switch (client->game_state)
+		{
+		case GGameState_s::LoadingScreen:
+			printf("Game is on loading screen.\n");
+			break;
+		case GGameState_s::Finished:
+			printf("Game finished.\n");
+			break;
+		default:
+			printf("Unknown game state.\n");
+			break;
+		}
+#endif
+		std::this_thread::sleep_for( 1s );
 		client = *reinterpret_cast< GameClient** >( std::uintptr_t( GetModuleHandle( nullptr ) ) + offsets::global::GameClient );
 	}
 
 	std::this_thread::sleep_for( 500ms );
+
+	// Now load others signature.
+	autoupdater::start(false);
+
+	std::this_thread::sleep_for(100ms);
 
 	config::load( );
 	d3d_hook::hook( );

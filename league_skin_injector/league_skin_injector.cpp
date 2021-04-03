@@ -186,10 +186,13 @@ int main( )
 		auto league_processes = find_processes( L"League of Legends.exe" );
 		for ( auto& pid : league_processes )
 		{
+
+			std::this_thread::sleep_for(1s);
+
 			if ( !is_injected( pid ) )
 				inject( pid );
 		}
-		std::this_thread::sleep_for( 5s );
+		std::this_thread::sleep_for( 3s );
 	}
 	return 0;
 }
