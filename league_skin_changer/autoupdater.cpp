@@ -157,9 +157,7 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"89 1D ? ? ? ? 56 8D 4B 04",
-			"8B 0D ? ? ? ? 83 C1 0C 89 14 24",
-			"8B 0D ? ? ? ? 57 FF 74 24 08 E8 ? ? ? ? 8B F8"
+			"89 1D ? ? ? ? 57 8D 4B 04"
 		},
 		true,
 		true,
@@ -188,7 +186,7 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"8D 8E ? ? ? ? FF 74 24 48"
+			"8D 8E ? ? ? ? FF 74 24 4C"
 		},
 		false,
 		true,
@@ -197,7 +195,7 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"80 BF ? ? ? ? ? 75 50 0F 31 33 C9 66 C7 87 ? ? ? ? ? ? 89 44 24 18"
+			"80 BE ? ? ? ? ? 75 50 0F 31 33 C9 66 C7 86 ? ? ? ? ? ? 89 44 24 18 33 FF"
 		},
 		false,
 		true,
@@ -227,12 +225,7 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"8A 87 ? ? ? ? 88 4C 24 0B",
-			"8A 87 ? ? ? ? 88 4C 24 0F 33 C9 0F B6 D0 84 C0 74 12",
-			"8A 86 ? ? ? ? 88 4C 24 17",
-			"8A 86 ? ? ? ? 88 4C 24 4C 33 C9 0F B6 D0 84 C0 74 1E",
-			"8A 86 ? ? ? ? 88 4C 24 1B",
-			"8A 87 ? ? ? ? 88 4C 24 13 33 C9 0F B6 D0 84 C0 74 15"
+			"8A 87 ? ? ? ? 88 4C 24 17"
 		},
 		false,
 		true,
@@ -241,8 +234,7 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"83 EC 4C 53 55 57 8B F9 8B 47 04",
-			"E8 ? ? ? ? 8B 74 24 14 85 F6 74 1E 8B C7 F0 0F C1 46 ? 75 15 8B 06 8B CE FF 10 F0 0F C1 7E ? 4F 75 07 8B 06 8B CE FF 50 04 5F 5E 5B 83 C4 14 C2 40 00"
+			"83 EC 50 53 55 56 57 8B F9 8B 47 04"
 		},
 		true,
 		false,
@@ -251,8 +243,7 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"83 EC 18 53 56 57 8D 44 24 20",
-			"E8 ? ? ? ? 8D 4C 24 14 E8 ? ? ? ? 8B 07"
+			"83 EC 1C 56 57 8D 44 24 20"
 		},
 		true,
 		false,
