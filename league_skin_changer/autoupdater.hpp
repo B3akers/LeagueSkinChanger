@@ -24,6 +24,6 @@
 */
 #pragma once
 namespace autoupdater { 
-	void start( );
+	void start( bool gameClient = true );
 };
 
