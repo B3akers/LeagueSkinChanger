@@ -139,14 +139,20 @@ void skin_changer::update( )
 			if ( hash == FNV( "JammerDevice" )
 				|| hash == FNV( "SightWard" )
 				|| hash == FNV( "YellowTrinket" )
-				|| hash == FNV( "VisionWard" ) )
+				|| hash == FNV( "VisionWard" )
+			   	|| hash == FNV( "TestCubeRender10Vision" ) ) // Kindred mark in objects like minions and champions.
 			{
 
 				// Change ward skin only for localplayer or for all if we are in replay mode
 				//
-				if ( !player || owner == player )
-					change_skin_for_object( minion, config::current_ward_skin_index );
-
+				if (!player || owner == player)
+				{
+					if (hash == FNV("TestCubeRender10Vision")) // Set kindred mark to default.
+						change_skin_for_object(minion, 0);
+					else
+						change_skin_for_object(minion, config::current_ward_skin_index);
+				}
+				
 				continue;
 			}
 
