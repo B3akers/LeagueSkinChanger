@@ -208,7 +208,7 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"80 BE ? ? ? ? ? 75 50 0F 31 33 C9 66 C7 86 ? ? ? ? ? ? 89 44 24 18 33 FF"
+			"80 BE ? ? ? ? ? 75 4D 0F 31 33 C9 66 C7 86 ? ? ? ? ? ? 89 44 24 18 33 FF"
 		},
 		false,
 		true,
@@ -256,7 +256,7 @@ std::vector<offset_signature> sigs = {
 	},
 	{
 		{
-			"83 EC 1C 56 57 8D 44 24 20"
+			"83 EC 2C 53 56 57 8D 44 24 28"
 		},
 		true,
 		false,
